@@ -1,10 +1,27 @@
 import { useState, useEffect } from 'react'
 import craftingTableArrow from './assets/craftingtablearrow.png'
+import searchicon from './assets/searchicon.png'
 import io from 'socket.io-client';
 
 const socket = io('http://localhost:6969');
 
+interface item{
+  name: string,
+  namespacedId: string,
+  description: string,
+  image: string,
+  renewable: boolean,
+  stackSize: number
+}
+
 function App() {
+  const [items, setItems] = useState<item[]>([]);
+
+  useEffect(() => {
+    fetch("http://localhost:6969/items")
+    .then(response => response.json())
+    .then(data => setItems(data.data))
+  }, []);
   return (
     <>
       <div id='craftingTable'>
@@ -32,7 +49,26 @@ function App() {
         <div id='item'/>
       </div>
       <div id='tips'></div>
-      <div id='items'></div>
+      <div id='items'>
+        <div id='itemBar'>
+          <div id='inventoryTitle'>Inventory</div>
+          <div id='itemSearch'>
+            <img id='searchIcon' src={searchicon} alt="search"/>
+            <input id='search' type="text" placeholder='Search...'/>
+          </div>
+        </div>
+        <div id='inventory'>
+          <div id='slots'>
+            {items.map((item:item, index) => {
+              return (
+                <div key={`itemSlot#${index}`} className='itemSlot'>
+                  <img src={item.image} alt={item.name}/>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      </div>
     </>
   )
 }

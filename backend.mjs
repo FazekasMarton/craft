@@ -1,4 +1,4 @@
-import express, { json } from "express";
+import express, { json, response } from "express";
 import cors from "cors";
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -35,7 +35,15 @@ const io = new Server(server, {
 });
 
 let items = null
+let recipies = null
 let riddles = {}
+
+app.get("/items", (req, res) => {
+    if(items == null){
+        items = JSON.parse(fs.readFileSync("./items.json", 'utf8'))
+    }
+    res.send(items)
+})
 
 io.on('connection', async(socket) => {
     await createRiddle(socket)
@@ -46,12 +54,12 @@ io.on('connection', async(socket) => {
 });
 
 async function createRiddle(socket){
-    if(items == null){
-        items = JSON.parse(fs.readFileSync("./recipes.json", 'utf8')).data;
+    if(recipies == null){
+        recipies = JSON.parse(fs.readFileSync("./recipes.json", 'utf8')).data;
     }
     let riddle
     do {
-        riddle = items[Math.floor(Math.random() * items.length)];
+        riddle = recipies[Math.floor(Math.random() * recipies.length)];
     } while (!validateRiddle(riddle));
     riddles[socket.id] = convertRiddle(riddle)
     console.log(riddles[socket.id])

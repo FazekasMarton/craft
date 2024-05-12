@@ -3,12 +3,18 @@
   src: url("./assets/minecraft-font/MinecraftRegular-Bmg3.otf");
 }
 
+@font-face{
+  font-family: MinecraftItalic;
+  src: url("./assets/minecraft-font/MinecraftItalic-R8Mo.otf");
+}
+
 html, body, #wrapper{
   height: 100%;
   padding: 0;
   margin: 0;
   font-family: MinecraftRegular;
   color: rgba(85,85,84,255);
+  background-color: rgba(194,195,195,255);
 }
 
 #wrapper{
@@ -16,11 +22,21 @@ html, body, #wrapper{
   grid-template-areas: 
   "craftingTable items"
   "tips items";
+  gap: 20px;
+}
+
+.itemSlot, #item{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+img{
+  height: 90%;
 }
 
 #craftingTable{
   grid-area: craftingTable;
-  background-color: rgba(194,195,195,255);
   display: grid;
   align-items: center;
   grid-template-columns: auto auto auto;
@@ -46,7 +62,7 @@ html, body, #wrapper{
   padding-left: 5px;
 }
 
-#craftingTable td, #item{
+#craftingTable td, #item, .itemSlot{
   width: 64px;
   height: 64px;
   border-top: 2px solid rgba(51,50,50,255);
@@ -70,6 +86,66 @@ html, body, #wrapper{
 
 #items{
   grid-area: items;
+  justify-self: end;
+  display: grid;
+  height: 98vh;
+  padding-bottom: 2vh;
+}
+
+.itemSlot{
+  width: 32px;
+  height: 32px;
+}
+
+#itemBar{
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 50px 10px 0;
+}
+
+#inventoryTitle{
+  padding-top: 10px;
+  font-size: 20px;
+}
+
+#itemSearch{
+  height: min-content;
+  background-color: rgba(55,54,54,255);
+  display: flex;
+  padding: 5px 20px;
+}
+
+#searchIcon{
+  height: 30px;
+}
+
+#search{
+  margin: 0;
+  padding: 0;
+  background-color: rgba(1,0,1,255);
+  color: rgba(124,125,124,255);
+  font-family: MinecraftRegular;
+  border: 2px solid rgba(158,158,159,255);
+  padding: 5px;
+  font-size: 15px;
+}
+
+#search::placeholder{
+  color: rgba(124,125,124,255);
+  font-family: MinecraftItalic;
+}
+
+#inventory{
+  overflow-y: scroll;
+}
+
+#slots{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1px;
+  justify-content: end;
+  padding: 0 10px;
 }
 
 #tips{
