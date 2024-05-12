@@ -65,7 +65,7 @@ function App() {
               if(item.name.toLocaleLowerCase().includes(search.toLocaleLowerCase())) display = "flex"
               return (
                 <div key={`itemSlot#${index}`} className='itemSlot' style={{display: display}}>
-                  <img src={item.image} alt={item.name}/>
+                  <img src={item.image} alt={item.name} title={item.name}/>
                 </div>
               )
             })}
