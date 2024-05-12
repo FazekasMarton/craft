@@ -16,6 +16,7 @@ interface item{
 
 function App() {
   const [items, setItems] = useState<item[]>([]);
+  const [search, setSearch] = useState("");
 
   useEffect(() => {
     fetch("http://localhost:6969/items")
@@ -54,14 +55,16 @@ function App() {
           <div id='inventoryTitle'>Inventory</div>
           <div id='itemSearch'>
             <img id='searchIcon' src={searchicon} alt="search"/>
-            <input id='search' type="text" placeholder='Search...'/>
+            <input id='search' type="text" placeholder='Search...' onInput={(e)=>{setSearch(e.currentTarget.value)}}/>
           </div>
         </div>
         <div id='inventory'>
           <div id='slots'>
             {items.map((item:item, index) => {
+              let display:string = "none"
+              if(item.name.toLocaleLowerCase().includes(search.toLocaleLowerCase())) display = "flex"
               return (
-                <div key={`itemSlot#${index}`} className='itemSlot'>
+                <div key={`itemSlot#${index}`} className='itemSlot' style={{display: display}}>
                   <img src={item.image} alt={item.name}/>
                 </div>
               )
