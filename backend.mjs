@@ -50,16 +50,59 @@ async function createRiddle(socket){
         items = JSON.parse(fs.readFileSync("./recipes.json", 'utf8')).data;
     }
     let riddle
-    let numberOfNulls = 0
     do {
         riddle = items[Math.floor(Math.random() * items.length)];
-        riddles[socket.id] = riddle
-        console.log(riddles[socket.id])
-        numberOfNulls = 0
-        riddles[socket.id].recipe.forEach(material => {
-            if(material == null) numberOfNulls++
+    } while (!validateRiddle(riddle));
+    riddles[socket.id] = convertRiddle(riddle)
+    console.log(riddles[socket.id])
+}
+
+function convertRiddle(riddle){
+    let craft_matrix = [[],[],[]]
+    let col = 0
+    let row = 0
+    riddle.recipe.forEach(material => {
+        craft_matrix[row].push(material)
+        col++
+        if(col == 3){
+            col = 0
+            row++
+        }
+    });
+    for (let i = 0; i < craft_matrix.length; i++) {
+        let is_all_null = true
+        craft_matrix[i].forEach(material => {
+            if(material != null) is_all_null &= false
         });
-    } while (numberOfNulls >= 8);
+        if(is_all_null){
+            craft_matrix.splice(i, 1)
+            i--
+        }
+    }
+    for (let i = 0; i < craft_matrix[0].length; i++) {
+        let is_all_null = true
+        for (let j = 0; j < craft_matrix.length; j++) {
+            if(craft_matrix[j][i] != null) is_all_null &= false
+        }
+        if(is_all_null){
+            for (let j = 0; j < craft_matrix.length; j++) {
+                craft_matrix[j].splice(i, 1)
+            }
+            i--
+        }
+    }
+    riddle.recipe = craft_matrix
+    return riddle
+}
+
+function validateRiddle(riddle){
+    let numberOfNulls = 0
+    let is_self_craft = false
+    riddle.recipe.forEach(material => {
+        if(material == null) numberOfNulls++
+        if(material == riddle.item) is_self_craft |= true
+    });
+    return numberOfNulls < 8 && !is_self_craft
 }
 
 server.listen(port, () => {
