@@ -14,9 +14,25 @@ interface item{
   stackSize: number
 }
 
+function drop(e: React.DragEvent, dropItem: HTMLElement | undefined, setDropItem:(element: HTMLElement)=>void){
+  if(e.currentTarget.childNodes.length == 0){
+    let newElement = dropItem?.cloneNode() as HTMLElement
+    newElement.addEventListener("drag", (e) => {
+      setDropItem(e.currentTarget as HTMLElement)
+    })
+    newElement.addEventListener("contextmenu", (e) => {
+      (e.currentTarget as HTMLElement).remove()
+      e.preventDefault()
+    })
+    e.currentTarget.appendChild(newElement)
+  }
+}
+
 function App() {
   const [items, setItems] = useState<item[]>([]);
   const [search, setSearch] = useState("");
+  const [dropItem, setDropItem] = useState<HTMLElement>();
+  const craftingTableSize = new Array(3).fill(null)
 
   useEffect(() => {
     fetch("http://localhost:6969/items")
@@ -29,21 +45,14 @@ function App() {
         <div id='craftingTitle'>Crafting</div>
         <table>
           <tbody>
-            <tr>
-              <td className='cragtingTableSlot' id='slot0'></td>
-              <td className='cragtingTableSlot' id='slot1'></td>
-              <td className='cragtingTableSlot' id='slot2'></td>
-            </tr>
-            <tr>
-              <td className='cragtingTableSlot' id='slot3'></td>
-              <td className='cragtingTableSlot' id='slot4'></td>
-              <td className='cragtingTableSlot' id='slot5'></td>
-            </tr>
-            <tr>
-              <td className='cragtingTableSlot' id='slot6'></td>
-              <td className='cragtingTableSlot' id='slot7'></td>
-              <td className='cragtingTableSlot' id='slot8'></td>
-            </tr>
+            {craftingTableSize.map((value, i) => {
+              return(<tr key={`row${i}`}>
+                {craftingTableSize.map((value, j) => {
+                  let key = `slot${i*craftingTableSize.length+j}`
+                  return(<td key={key} className='cragtingTableSlot' id={key} onDragOver={(e) => {drop(e, dropItem, setDropItem)}}></td>)
+                })}
+              </tr>)
+            })}
           </tbody>
         </table>
         <img id='craftingArrow' src={craftingTableArrow} alt="arrow"/>
@@ -65,7 +74,7 @@ function App() {
               if(item.name.toLocaleLowerCase().includes(search.toLocaleLowerCase())) display = "flex"
               return (
                 <div key={`itemSlot#${index}`} className='itemSlot' style={{display: display}}>
-                  <img src={item.image} alt={item.name} title={item.name}/>
+                  <img src={item.image} alt={item.name} title={item.name} draggable onDrag={(e) => {setDropItem(e.currentTarget)}}/>
                 </div>
               )
             })}

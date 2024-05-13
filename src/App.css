@@ -26,12 +26,6 @@ html, body, #wrapper{
   gap: 20px;
 }
 
-.itemSlot, #item{
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 img{
   height: 90%;
 }
@@ -61,6 +55,7 @@ img{
   grid-area: craft;
   width: max-content;
   padding-left: 5px;
+  border-collapse: collapse;
 }
 
 #craftingTable td, #item, .itemSlot{
@@ -72,6 +67,10 @@ img{
   border-left: 2px solid rgba(57,56,56,255);
   padding: 0;
   background-color: rgba(138,139,139,255);
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  margin: 1px;
 }
 
 #craftingArrow{
