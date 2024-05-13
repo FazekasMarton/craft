@@ -35,7 +35,7 @@ const io = new Server(server, {
 });
 
 let items = null
-let recipies = null
+let recipes = null
 let riddles = {}
 
 app.get("/items", (req, res) => {
@@ -43,6 +43,13 @@ app.get("/items", (req, res) => {
         items = JSON.parse(fs.readFileSync("./items.json", 'utf8'))
     }
     res.send(items)
+})
+
+app.get("/recipes", (req, res) => {
+    if(recipes == null){
+        convertRecipes()
+    }
+    res.send({data: recipes})
 })
 
 io.on('connection', async(socket) => {
@@ -53,15 +60,22 @@ io.on('connection', async(socket) => {
     })
 });
 
+function convertRecipes(){
+    recipes = JSON.parse(fs.readFileSync("./recipes.json", 'utf8')).data;
+    recipes.forEach(recipe => {
+        recipe = convertRiddle(recipe)
+    });
+}
+
 async function createRiddle(socket){
-    if(recipies == null){
-        recipies = JSON.parse(fs.readFileSync("./recipes.json", 'utf8')).data;
+    if(recipes == null){
+        convertRecipes()
     }
     let riddle
     do {
-        riddle = recipies[Math.floor(Math.random() * recipies.length)];
+        riddle = recipes[Math.floor(Math.random() * recipes.length)];
     } while (!validateRiddle(riddle));
-    riddles[socket.id] = convertRiddle(riddle)
+    riddles[socket.id] = riddle
     console.log(riddles[socket.id])
 }
 
@@ -106,9 +120,11 @@ function convertRiddle(riddle){
 function validateRiddle(riddle){
     let numberOfNulls = 0
     let is_self_craft = false
-    riddle.recipe.forEach(material => {
-        if(material == null) numberOfNulls++
-        if(material == riddle.item) is_self_craft |= true
+    riddle.recipe.forEach(row => {
+        row.forEach(material => {
+            if(material == null) numberOfNulls++
+            if(material == riddle.item) is_self_craft |= true
+        });
     });
     return numberOfNulls < 8 && !is_self_craft
 }
