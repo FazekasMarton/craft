@@ -3034,14 +3034,6 @@
     },
     {
       "name": "Empty Map",
-      "namespacedId": "map",
-      "description": "A map is an item used to view explored terrain and mark landmarks.",
-      "image": "https://minecraft-api.vercel.app/images/items/map.png",
-      "renewable": true,
-      "stackSize": 64
-    },
-    {
-      "name": "Empty Map",
       "namespacedId": "filled_map",
       "description": "A map is an item used to view explored terrain and mark landmarks.",
       "image": "https://minecraft-api.vercel.app/images/items/empty_map.png",
