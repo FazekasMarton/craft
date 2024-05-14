@@ -21,7 +21,14 @@ interface recipe{
   shapeless: boolean
 }
 
-function drop(e: React.DragEvent, dropItem: HTMLElement | undefined, setDropItem:(element: HTMLElement)=>void, recipes:recipe[], items:item[], drop:boolean){
+interface hints{
+  tips:number,
+  hint1:number,
+  hint2:number,
+  hint3:string
+}
+
+function drop(e: React.DragEvent, dropItem: HTMLElement | undefined, setDropItem:(element: HTMLElement)=>void, recipes:recipe[], items:item[], drop:boolean, setHints:(value:hints) => void){
   if(e.currentTarget.childNodes.length == 0){
     e.preventDefault()
     let newElement = dropItem as HTMLElement
@@ -32,16 +39,16 @@ function drop(e: React.DragEvent, dropItem: HTMLElement | undefined, setDropItem
       })
       newElement.addEventListener("contextmenu", (e) => {
         (e.currentTarget as HTMLElement).remove()
-        craft(recipes, items)
+        craft(recipes, items, setHints)
         e.preventDefault()
       })
       e.currentTarget.appendChild(newElement)
     }
   }
-  craft(recipes, items)
+  craft(recipes, items, setHints)
 }
 
-function craft(recipes:recipe[], items:item[]){
+function craft(recipes:recipe[], items:item[], setHints:(value:hints) => void){
   let item = document.getElementById("item")
   item?.childNodes[0]?.remove()
   let craftingTablecontent:string[] = []
@@ -54,10 +61,10 @@ function craft(recipes:recipe[], items:item[]){
     craftingTablecontent.push(itemName)
   }
   let craftingRecipe = convertRecipe(craftingTablecontent)
-  findCraftingRecipe(craftingRecipe, recipes, item, items)
+  findCraftingRecipe(craftingRecipe, recipes, item, items, setHints)
 }
 
-function findCraftingRecipe(craftingRecipe:string[][], recipes: recipe[], item:HTMLElement | null, items:item[]){
+function findCraftingRecipe(craftingRecipe:string[][], recipes: recipe[], item:HTMLElement | null, items:item[], setHints:(value:hints) => void){
   recipes.forEach(recipe => {
     let isRecipeCorrect = false
     if(craftingRecipe?.length == recipe.recipe?.length && craftingRecipe[0]?.length == recipe.recipe[0]?.length){
@@ -75,6 +82,7 @@ function findCraftingRecipe(craftingRecipe:string[][], recipes: recipe[], item:H
           craftedItem.src = i.image
           craftedItem.draggable = false
           item?.appendChild(craftedItem)
+          getHints(setHints)
         }
       });
     }
@@ -118,11 +126,16 @@ function convertRecipe(recipe:string[]){
   return craftMatrix
 }
 
+function getHints(setHints:(value:hints) => void){
+  socket.emit("getHints")
+}
+
 function App() {
   const [items, setItems] = useState<item[]>([]);
   const [recipes, setRecipes] = useState<recipe[]>([]);
   const [search, setSearch] = useState("");
   const [dropItem, setDropItem] = useState<HTMLElement>();
+  const [hints, setHints] = useState<hints>();
   const craftingTableSize = new Array(3).fill(null)
 
   useEffect(() => {
@@ -147,7 +160,7 @@ function App() {
               return(<tr key={`row${i}`}>
                 {craftingTableSize.map((value, j) => {
                   let key = `slot${i*craftingTableSize.length+j}`
-                  return(<td key={key} className='cragtingTableSlot' id={key} onDragOver={(e) => {drop(e, dropItem, setDropItem, recipes, items, false)}} onDrop={(e) => {drop(e, dropItem, setDropItem, recipes, items, true)}}></td>)
+                  return(<td key={key} className='cragtingTableSlot' id={key} onDragOver={(e) => {drop(e, dropItem, setDropItem, recipes, items, false, setHints)}} onDrop={(e) => {drop(e, dropItem, setDropItem, recipes, items, true, setHints)}}></td>)
                 })}
               </tr>)
             })}
@@ -156,8 +169,26 @@ function App() {
         <img id='craftingArrow' src={craftingTableArrow} alt="arrow"/>
         <div id='item'></div>
       </div>
-      <div id='tips'></div>
-      <div id='items' onDragOver={(e) => {e.preventDefault()}} onDrop={(e) => {if((dropItem?.parentNode as HTMLElement)?.className != "itemSlot") dropItem?.remove(); craft(recipes, items)}}>
+      <div id='tips'>
+        <div id='hints'>
+          <div id='hintsTitle'>Hints:</div>
+          <table>
+            <tbody>
+              <tr>
+                <td>Stack Size</td>
+                <td>Quantity</td>
+                <td>Random Material</td>
+              </tr>
+              <tr>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div id='items' onDragOver={(e) => {e.preventDefault()}} onDrop={(e) => {if((dropItem?.parentNode as HTMLElement)?.className != "itemSlot") dropItem?.remove(); craft(recipes, items, setHints)}}>
         <div id='itemBar'>
           <div id='inventoryTitle'>Inventory</div>
           <div id='itemSearch'>
