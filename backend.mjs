@@ -55,6 +55,26 @@ app.get("/recipes", (req, res) => {
 io.on('connection', async(socket) => {
     await createRiddle(socket)
 
+    socket.on("getHints", () => {
+        let hints = {
+            tips: riddles[socket.id].tips,
+            hint1: null,
+            hint2: null,
+            hint3: null
+        }
+        let hints_template = riddles[socket.id].hints
+        if(hints.tips >= 5){
+            hints.hint1 = hints_template.hint1
+            if(hints.tips >= 10){
+                hints.hint2 = hints_template.hint2
+                if(hints.tips >= 15){
+                    hints.hint3 = hints_template.hint3
+                }
+            }
+        }
+        socket.emit("hints", hints)
+    })
+
     socket.on("disconnect", () => {
         delete riddles[socket.id]
     })
@@ -75,8 +95,35 @@ async function createRiddle(socket){
     do {
         riddle = recipes[Math.floor(Math.random() * recipes.length)];
     } while (!validateRiddle(riddle));
-    riddles[socket.id] = riddle
-    console.log(riddles[socket.id])
+    riddles[socket.id] = {}
+    riddles[socket.id]["riddle"] = riddle
+    riddles[socket.id]["tips"] = 99
+    riddles[socket.id]["hints"] = generateHints(riddle)
+    console.log(riddles[socket.id].riddle)
+}
+
+function generateHints(riddle){
+    let hints = {}
+    hints["hint1"] = getStackSize(riddle.item)
+    hints["hint2"] = riddle.quantity
+    hints["hint3"] = randomizeMaterial(riddle.recipe)
+    return hints
+}
+
+function randomizeMaterial(materials){
+    materials = materials.flat(Infinity)
+    return materials[Math.floor(Math.random() * materials.length)]
+}
+
+function getStackSize(item_name){
+    if(items == null){
+        items = JSON.parse(fs.readFileSync("./items.json", 'utf8'))
+    }
+    let stack_size = undefined
+    items.data.forEach(item => {
+        if(item.name == item_name) stack_size = item.stackSize
+    });
+    return stack_size
 }
 
 function convertRiddle(riddle){

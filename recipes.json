@@ -2546,22 +2546,6 @@
       "shapeless": false
     },
     {
-      "item": "Buried Treasure Map",
-      "quantity": 4,
-      "recipe": [
-        "Empty Map",
-        "Empty Map",
-        "Empty Map",
-        "Buried Treasure Map",
-        "Empty Map",
-        null,
-        "Empty Map",
-        "Empty Map",
-        "Empty Map"
-      ],
-      "shapeless": true
-    },
-    {
       "item": "Cake",
       "quantity": 1,
       "recipe": [
@@ -4877,7 +4861,7 @@
         "Paper",
         "Paper",
         "Paper",
-        null,
+        "Compass",
         "Paper",
         "Paper",
         "Paper",
@@ -9967,38 +9951,6 @@
         "Cobblestone"
       ],
       "shapeless": false
-    },
-    {
-      "item": "Ocean Explorer Map",
-      "quantity": 2,
-      "recipe": [
-        "Empty Map",
-        "Empty Map",
-        "Empty Map",
-        "Ocean Explorer Map",
-        "Empty Map",
-        "Empty Map",
-        "Empty Map",
-        "Empty Map",
-        "Empty Map"
-      ],
-      "shapeless": true
-    },
-    {
-      "item": "Ocean Explorer Map",
-      "quantity": 5,
-      "recipe": [
-        "Empty Map",
-        "Empty Map",
-        null,
-        "Ocean Explorer Map",
-        "Empty Map",
-        null,
-        "Empty Map",
-        "Empty Map",
-        "Empty Map"
-      ],
-      "shapeless": true
     },
     {
       "item": "Orange Banner",
@@ -15429,38 +15381,6 @@
         null
       ],
       "shapeless": false
-    },
-    {
-      "item": "Woodland Explorer Map",
-      "quantity": 3,
-      "recipe": [
-        "Empty Map",
-        "Empty Map",
-        "Empty Map",
-        "Woodland Explorer Map",
-        "Empty Map",
-        "Empty Map",
-        "Empty Map",
-        "Empty Map",
-        "Empty Map"
-      ],
-      "shapeless": true
-    },
-    {
-      "item": "Woodland Explorer Map",
-      "quantity": 6,
-      "recipe": [
-        "Empty Map",
-        null,
-        null,
-        "Woodland Explorer Map",
-        "Empty Map",
-        null,
-        "Empty Map",
-        "Empty Map",
-        "Empty Map"
-      ],
-      "shapeless": true
     },
     {
       "item": "Written Book",
