@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, ReactNode, ReactElement } from 'react'
 import craftingTableArrow from './assets/craftingtablearrow.png'
 import searchicon from './assets/searchicon.png'
 import io from 'socket.io-client';
@@ -23,12 +23,12 @@ interface recipe{
 
 interface hints{
   tips:number,
-  hint1:number,
-  hint2:number,
-  hint3:string
+  hint1:string | null,
+  hint2:string | null,
+  hint3:string | null
 }
 
-function drop(e: React.DragEvent, dropItem: HTMLElement | undefined, setDropItem:(element: HTMLElement)=>void, recipes:recipe[], items:item[], drop:boolean, setHints:(value:hints) => void){
+function drop(e: React.DragEvent, dropItem: HTMLElement | undefined, setDropItem:(element: HTMLElement)=>void, recipes:recipe[], items:item[], drop:boolean){
   if(e.currentTarget.childNodes.length == 0){
     e.preventDefault()
     let newElement = dropItem as HTMLElement
@@ -39,16 +39,16 @@ function drop(e: React.DragEvent, dropItem: HTMLElement | undefined, setDropItem
       })
       newElement.addEventListener("contextmenu", (e) => {
         (e.currentTarget as HTMLElement).remove()
-        craft(recipes, items, setHints)
+        craft(recipes, items)
         e.preventDefault()
       })
       e.currentTarget.appendChild(newElement)
     }
   }
-  craft(recipes, items, setHints)
+  craft(recipes, items)
 }
 
-function craft(recipes:recipe[], items:item[], setHints:(value:hints) => void){
+function craft(recipes:recipe[], items:item[]){
   let item = document.getElementById("item")
   item?.childNodes[0]?.remove()
   let craftingTablecontent:string[] = []
@@ -61,10 +61,10 @@ function craft(recipes:recipe[], items:item[], setHints:(value:hints) => void){
     craftingTablecontent.push(itemName)
   }
   let craftingRecipe = convertRecipe(craftingTablecontent)
-  findCraftingRecipe(craftingRecipe, recipes, item, items, setHints)
+  findCraftingRecipe(craftingRecipe, recipes, item, items)
 }
 
-function findCraftingRecipe(craftingRecipe:string[][], recipes: recipe[], item:HTMLElement | null, items:item[], setHints:(value:hints) => void){
+function findCraftingRecipe(craftingRecipe:string[][], recipes: recipe[], item:HTMLElement | null, items:item[]){
   recipes.forEach(recipe => {
     let isRecipeCorrect = false
     if(craftingRecipe?.length == recipe.recipe?.length && craftingRecipe[0]?.length == recipe.recipe[0]?.length){
@@ -82,7 +82,7 @@ function findCraftingRecipe(craftingRecipe:string[][], recipes: recipe[], item:H
           craftedItem.src = i.image
           craftedItem.draggable = false
           item?.appendChild(craftedItem)
-          getHints(setHints)
+          getHints()
         }
       });
     }
@@ -126,8 +126,24 @@ function convertRecipe(recipe:string[]){
   return craftMatrix
 }
 
-function getHints(setHints:(value:hints) => void){
+function getHints(){
   socket.emit("getHints")
+}
+
+function getHintContent(numberOfTips:number, hint:number | string | null, hintNumber:number, usedHint:boolean[], setUsedHint:(value: boolean[]) => void){
+  let content = <></>
+  if(hint == null){
+    content = <button>Hint after {hintNumber * 5 - numberOfTips} turn!</button>
+  }else if(usedHint[hintNumber]){
+    content = <div className='hint'>{hint}</div>
+  }else{
+    content = <button onClick={() => {
+      const updatedUsedHint = [...usedHint];
+      updatedUsedHint[hintNumber] = true;
+      setUsedHint(updatedUsedHint);
+    }}>Revail hint</button>
+  }
+  return content
 }
 
 function App() {
@@ -135,8 +151,18 @@ function App() {
   const [recipes, setRecipes] = useState<recipe[]>([]);
   const [search, setSearch] = useState("");
   const [dropItem, setDropItem] = useState<HTMLElement>();
-  const [hints, setHints] = useState<hints>();
+  const [hints, setHints] = useState<hints>({
+    tips: 0,
+    hint1: null,
+    hint2: null,
+    hint3: null
+  });
+  const [usedHints, setUsedHints] = useState([false, false, false]);
   const craftingTableSize = new Array(3).fill(null)
+
+  socket.on("hints", data => {
+    setHints(data)
+  })
 
   useEffect(() => {
     fetch("http://localhost:6969/items")
@@ -160,7 +186,7 @@ function App() {
               return(<tr key={`row${i}`}>
                 {craftingTableSize.map((value, j) => {
                   let key = `slot${i*craftingTableSize.length+j}`
-                  return(<td key={key} className='cragtingTableSlot' id={key} onDragOver={(e) => {drop(e, dropItem, setDropItem, recipes, items, false, setHints)}} onDrop={(e) => {drop(e, dropItem, setDropItem, recipes, items, true, setHints)}}></td>)
+                  return(<td key={key} className='cragtingTableSlot' id={key} onDragOver={(e) => {drop(e, dropItem, setDropItem, recipes, items, false)}} onDrop={(e) => {drop(e, dropItem, setDropItem, recipes, items, true)}}></td>)
                 })}
               </tr>)
             })}
@@ -170,25 +196,16 @@ function App() {
         <div id='item'></div>
       </div>
       <div id='tips'>
-        <div id='hints'>
+        <div id='hintContainer'>
           <div id='hintsTitle'>Hints:</div>
-          <table>
-            <tbody>
-              <tr>
-                <td>Stack Size</td>
-                <td>Quantity</td>
-                <td>Random Material</td>
-              </tr>
-              <tr>
-                <td></td>
-                <td></td>
-                <td></td>
-              </tr>
-            </tbody>
-          </table>
+          <div id='hints'>
+            <div>{getHintContent(hints.tips, hints.hint1, 1, usedHints, setUsedHints)}</div>
+            <div>{getHintContent(hints.tips, hints.hint2, 2, usedHints, setUsedHints)}</div>
+            <div>{getHintContent(hints.tips, hints.hint3, 3, usedHints, setUsedHints)}</div>
+          </div>
         </div>
       </div>
-      <div id='items' onDragOver={(e) => {e.preventDefault()}} onDrop={(e) => {if((dropItem?.parentNode as HTMLElement)?.className != "itemSlot") dropItem?.remove(); craft(recipes, items, setHints)}}>
+      <div id='items' onDragOver={(e) => {e.preventDefault()}} onDrop={(e) => {if((dropItem?.parentNode as HTMLElement)?.className != "itemSlot") dropItem?.remove(); craft(recipes, items)}}>
         <div id='itemBar'>
           <div id='inventoryTitle'>Inventory</div>
           <div id='itemSearch'>

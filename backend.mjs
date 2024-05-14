@@ -104,15 +104,32 @@ async function createRiddle(socket){
 
 function generateHints(riddle){
     let hints = {}
-    hints["hint1"] = getStackSize(riddle.item)
-    hints["hint2"] = riddle.quantity
-    hints["hint3"] = randomizeMaterial(riddle.recipe)
+    hints["hint1"] = `Stack size: ${getStackSize(riddle.item)}\nQuantity: ${riddle.quantity}`
+    hints["hint2"] = `Number of different materials: ${findDifferentMaterials(riddle.recipe)}`
+    hints["hint3"] = `Random material: ${randomizeMaterial(riddle.recipe)}`
     return hints
+}
+
+function findDifferentMaterials(recipe){
+    let materials = new Set()
+    recipe.forEach(row => {
+        row.forEach(material => {
+            if(!(Array.isArray(material) && material.includes(null) || material == null)){
+                if(Array.isArray(material)) material = material.join(", ")
+                materials.add(material)
+            }
+        });
+    });
+    return materials.size
 }
 
 function randomizeMaterial(materials){
     materials = materials.flat(Infinity)
-    return materials[Math.floor(Math.random() * materials.length)]
+    let material = null
+    while(material == null){
+        material = materials[Math.floor(Math.random() * materials.length)]
+    }
+    return material
 }
 
 function getStackSize(item_name){
@@ -165,15 +182,15 @@ function convertRiddle(riddle){
 }
 
 function validateRiddle(riddle){
-    let numberOfNulls = 0
+    let numberOfMaterials = 0
     let is_self_craft = false
     riddle.recipe.forEach(row => {
         row.forEach(material => {
-            if(material == null) numberOfNulls++
+            if(material != null) numberOfMaterials++
             if(material == riddle.item) is_self_craft |= true
         });
     });
-    return numberOfNulls < 8 && !is_self_craft
+    return numberOfMaterials > 1 && !is_self_craft
 }
 
 server.listen(port, () => {
