@@ -5122,7 +5122,10 @@
         null,
         null,
         null,
-        "Firework Star",
+        [
+          null, 
+          "Firework Star"
+        ],
         "Paper",
         "Gunpowder",
         [
@@ -13409,22 +13412,6 @@
       "shapeless": true
     },
     {
-      "item": "Stone Axe",
-      "quantity": 1,
-      "recipe": [
-        "Cobblestone",
-        "Cobblestone",
-        null,
-        "Cobblestone",
-        "Stick",
-        null,
-        null,
-        "Stick",
-        null
-      ],
-      "shapeless": false
-    },
-    {
       "item": "Stone Brick Slab",
       "quantity": 6,
       "recipe": [
@@ -13545,22 +13532,6 @@
       "shapeless": true
     },
     {
-      "item": "Stone Hoe",
-      "quantity": 1,
-      "recipe": [
-        "Cobblestone",
-        "Cobblestone",
-        null,
-        null,
-        "Stick",
-        null,
-        null,
-        "Stick",
-        null
-      ],
-      "shapeless": false
-    },
-    {
       "item": "Stone Pickaxe",
       "quantity": 1,
       "recipe": [
@@ -13603,22 +13574,6 @@
         null
       ],
       "shapeless": true
-    },
-    {
-      "item": "Stone Pickaxe",
-      "quantity": 1,
-      "recipe": [
-        "Cobblestone",
-        "Cobblestone",
-        "Cobblestone",
-        null,
-        "Stick",
-        null,
-        null,
-        "Stick",
-        null
-      ],
-      "shapeless": false
     },
     {
       "item": "Stone Pressure Plate",
@@ -13671,22 +13626,6 @@
         null
       ],
       "shapeless": true
-    },
-    {
-      "item": "Stone Shovel",
-      "quantity": 1,
-      "recipe": [
-        null,
-        "Cobblestone",
-        null,
-        null,
-        "Stick",
-        null,
-        null,
-        "Stick",
-        null
-      ],
-      "shapeless": false
     },
     {
       "item": "Stone Slab",
@@ -13759,22 +13698,6 @@
         null
       ],
       "shapeless": true
-    },
-    {
-      "item": "Stone Sword",
-      "quantity": 1,
-      "recipe": [
-        null,
-        "Cobblestone",
-        null,
-        null,
-        "Cobblestone",
-        null,
-        null,
-        "Stick",
-        null
-      ],
-      "shapeless": false
     },
     {
       "item": "Stripped Acacia Wood",

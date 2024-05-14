@@ -8,13 +8,20 @@
   src: url("./assets/minecraft-font/MinecraftItalic-R8Mo.otf");
 }
 
+* {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
 html, body, #wrapper{
   height: 100%;
   padding: 0;
   margin: 0;
   font-family: MinecraftRegular;
-  color: rgba(85,85,84,255);
-  background-color: rgba(194,195,195,255);
+  color: rgba(85,85,84);
+  background-color: rgba(194,195,195);
 }
 
 #wrapper{
@@ -62,12 +69,12 @@ img{
 #craftingTable td, #item, .itemSlot{
   width: 64px;
   height: 64px;
-  border-top: 2px solid rgba(51,50,50,255);
-  border-right: 2px solid rgba(255,254,254,255);
-  border-bottom: 2px solid rgba(254,255,255,255);
-  border-left: 2px solid rgba(57,56,56,255);
+  border-top: 2px solid rgba(51,50,50);
+  border-right: 2px solid rgba(255,254,254);
+  border-bottom: 2px solid rgba(254,255,255);
+  border-left: 2px solid rgba(57,56,56);
   padding: 0;
-  background-color: rgba(138,139,139,255);
+  background-color: rgba(138,139,139);
   display: inline-flex;
   justify-content: center;
   align-items: center;
@@ -115,7 +122,7 @@ img{
 
 #itemSearch{
   height: min-content;
-  background-color: rgba(55,54,54,255);
+  background-color: rgba(55,54,54);
   display: flex;
   padding: 5px 20px;
 }
@@ -127,16 +134,16 @@ img{
 #search{
   margin: 0;
   padding: 0;
-  background-color: rgba(1,0,1,255);
-  color: rgba(124,125,124,255);
+  background-color: rgba(1,0,1);
+  color: rgba(124,125,124);
   font-family: MinecraftRegular;
-  border: 2px solid rgba(158,158,159,255);
+  border: 2px solid rgba(158,158,159);
   padding: 5px;
   font-size: 15px;
 }
 
 #search::placeholder{
-  color: rgba(124,125,124,255);
+  color: rgba(124,125,124);
   font-family: MinecraftItalic;
 }
 
@@ -154,4 +161,61 @@ img{
 
 #tips{
   grid-area: tips;
+  padding: 10px;
+}
+
+#hintsTitle{
+  font-size: 20px;
+}
+
+#hints{
+  display: flex;
+  justify-content: space-between;
+}
+
+#hints > div{
+  width: 30%;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#hints button{
+  background-color: rgba(59,132,39);
+  border-top: 4px solid rgba(101,157,80);
+  border-right: 4px solid rgba(28,63,19);
+  border-bottom: 4px solid rgba(22,79,14);
+  border-left: 4px solid rgba(66,115,52);
+  padding: 10px;
+  color: white;
+  width: 100%;
+  height: 100%;
+  font-family: MinecraftRegular;
+  font-size: 18px;
+}
+
+#hints button:hover{
+  background-color: rgb(53, 113, 36);
+  border-top: 4px solid rgb(93, 144, 74);
+  border-right: 4px solid rgb(25, 56, 17);
+  border-bottom: 4px solid rgb(19, 71, 13);
+  border-left: 4px solid rgb(54, 95, 43);
+  color: rgb(219, 219, 219);
+}
+
+.hint{
+  background-color: rgba(138,139,139);
+  border-top: 2px solid rgba(51,50,50);
+  border-right: 2px solid rgba(255,254,254);
+  border-bottom: 2px solid rgba(254,255,255);
+  border-left: 2px solid rgba(57,56,56);
+  color: rgb(39, 39, 39);
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 15px;
 }

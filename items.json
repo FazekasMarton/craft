@@ -5625,14 +5625,6 @@
       "stackSize": 64
     },
     {
-      "name": "Nether Wart",
-      "namespacedId": "nether_wart",
-      "description": "Nether wart is a fungus found in the Nether that is vital in the creation of potions.",
-      "image": "https://minecraft-api.vercel.app/images/items/nether_wart.png",
-      "renewable": true,
-      "stackSize": 64
-    },
-    {
       "name": "Nether Wart Block",
       "namespacedId": "nether_wart_block",
       "description": "Nether wart blocks are decorative blocks found in crimson forests and crafted using Nether wart.",
