@@ -64,7 +64,7 @@ function findCraftingRecipe(craftingRecipe:string[][], recipes: recipe[], item:H
       isRecipeCorrect = true
       recipe.recipe.forEach((row, i) => {
         row.forEach((material, j) => {
-          if(!(material == craftingRecipe[i][j] || material?.includes(craftingRecipe[i][j]))) isRecipeCorrect = isRecipeCorrect && false
+          if(!(material == craftingRecipe[i][j] || (material?.includes(craftingRecipe[i][j]) && Array.isArray(material)))) isRecipeCorrect = isRecipeCorrect && false
         });
       });
     }
@@ -73,6 +73,7 @@ function findCraftingRecipe(craftingRecipe:string[][], recipes: recipe[], item:H
         if(i.name == recipe.item){
           let craftedItem = document.createElement("img")
           craftedItem.src = i.image
+          craftedItem.draggable = false
           item?.appendChild(craftedItem)
         }
       });
@@ -153,7 +154,7 @@ function App() {
           </tbody>
         </table>
         <img id='craftingArrow' src={craftingTableArrow} alt="arrow"/>
-        <div id='item'/>
+        <div id='item'></div>
       </div>
       <div id='tips'></div>
       <div id='items' onDragOver={(e) => {e.preventDefault()}} onDrop={(e) => {if((dropItem?.parentNode as HTMLElement)?.className != "itemSlot") dropItem?.remove(); craft(recipes, items)}}>

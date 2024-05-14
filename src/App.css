@@ -28,6 +28,7 @@ html, body, #wrapper{
 
 img{
   height: 90%;
+  max-height: 58px;
 }
 
 #craftingTable{
