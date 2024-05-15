@@ -67,14 +67,11 @@ function craft(recipes:recipe[], items:item[]){
 function findCraftingRecipe(craftingRecipe:string[][], recipes: recipe[], item:HTMLElement | null, items:item[]){
   recipes.forEach(recipe => {
     let isRecipeCorrect = false
-    if(craftingRecipe?.length == recipe.recipe?.length && craftingRecipe[0]?.length == recipe.recipe[0]?.length){
-      isRecipeCorrect = true
-      recipe.recipe.forEach((row, i) => {
-        row.forEach((material, j) => {
-          if(!(material == craftingRecipe[i][j] || (material?.includes(craftingRecipe[i][j]) && Array.isArray(material)))) isRecipeCorrect = isRecipeCorrect && false
-        });
-      });
-    }
+      if(recipe.shapeless){
+        isRecipeCorrect = shapeless(craftingRecipe, recipe)
+      }else{
+        isRecipeCorrect = nonShapeless(craftingRecipe, recipe)
+      }
     if(isRecipeCorrect){
       items.forEach(i => {
         if(i.name == recipe.item){
@@ -89,6 +86,25 @@ function findCraftingRecipe(craftingRecipe:string[][], recipes: recipe[], item:H
   });
 }
 
+function shapeless(craftingRecipe: string[][], recipe: recipe){
+  let isRecipeCorrect = false
+  
+  return isRecipeCorrect
+}
+
+function nonShapeless(craftingRecipe: string[][], recipe: recipe){
+  let isRecipeCorrect = false
+  if(craftingRecipe?.length == recipe.recipe?.length && craftingRecipe[0]?.length == recipe.recipe[0]?.length){
+    isRecipeCorrect = true
+    recipe.recipe.forEach((row, i) => {
+      row.forEach((material, j) => {
+        if(!(material == craftingRecipe[i][j] || (material?.includes(craftingRecipe[i][j]) && Array.isArray(material)))) isRecipeCorrect = isRecipeCorrect && false
+      });
+    });
+  }
+  return isRecipeCorrect
+}
+
 function convertRecipe(recipe:string[]){
   let craftMatrix:string[][] = [[],[],[]]
   let col = 0
@@ -101,27 +117,33 @@ function convertRecipe(recipe:string[]){
           row++
       }
   });
-  for (let i = 0; i < craftMatrix.length; i++) {
-      let isAllNull = true
-      craftMatrix[i].forEach(material => {
-          if(material != null) isAllNull = isAllNull && false
-      });
-      if(isAllNull){
-          craftMatrix.splice(i, 1)
-          i--
-      }
-  }
-  for (let i = 0; i < craftMatrix[0]?.length; i++) {
-      let isAllNull = true
-      for (let j = 0; j < craftMatrix.length; j++) {
-          if(craftMatrix[j][i] != null) isAllNull = isAllNull && false
-      }
-      if(isAllNull){
-          for (let j = 0; j < craftMatrix.length; j++) {
-              craftMatrix[j].splice(i, 1)
+  for (let a = 0; a < 2; a++) {
+    for (let i = 0; i < craftMatrix.length; i++) {
+        let isAllNull = true
+        if(i != 1 || craftMatrix.length < 3){
+          craftMatrix[i].forEach(material => {
+              if(material != null) isAllNull = isAllNull && false
+          });
+          if(isAllNull){
+              craftMatrix.splice(i, 1)
+              i--
           }
-          i--
+        }
+    }
+    for (let i = 0; i < craftMatrix[0]?.length; i++) {
+      let isAllNull = true
+      if(i != 1 || craftMatrix[0].length < 3){
+        for (let j = 0; j < craftMatrix.length; j++) {
+            if(craftMatrix[j][i] != null) isAllNull = isAllNull && false
+        }
+        if(isAllNull){
+            for (let j = 0; j < craftMatrix.length; j++) {
+                craftMatrix[j].splice(i, 1)
+            }
+            i--
+        }
       }
+    }
   }
   return craftMatrix
 }
