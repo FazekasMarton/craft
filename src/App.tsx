@@ -130,6 +130,14 @@ function shapeless(craftingRecipe: Array<Array<string | null>>, recipe: recipe) 
           }
         });
       });
+      if(match){
+        for (let i = 0; i < flatCraftingRecipe.length; i++) {
+          if(flatCraftingRecipe[i] == null){
+            flatCraftingRecipe.splice(i, 1)
+            i--
+          }
+        }
+      }
     }
   }
   return match && flatCraftingRecipe.length == 0
