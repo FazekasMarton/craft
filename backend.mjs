@@ -56,6 +56,10 @@ io.on('connection', async(socket) => {
     await createRiddle(socket)
 
     socket.on("checkTip", (data) => {
+        if(!riddles[socket.id]["tippedItems"].includes(data.craftedItem)){
+            riddles[socket.id]["tips"]++;
+            riddles[socket.id]["tippedItems"].push(data.craftedItem)
+        };
         let result = {};
         if(riddles[socket.id].shapeless){
             console.log("akurvaanyád")
@@ -95,9 +99,7 @@ function checkShapedRecipe(riddle, data){
     console.log(matrixLengthData);
     if(matrixLengthData.same){
         let matches = checkMatches(riddle.riddle, data);
-        if(matches.numberOfMatches == matrixLengthData.len){
-            return matches.matches;
-        }
+        return matches.matches;
     }
 }
 
@@ -121,23 +123,62 @@ function compareMatrixLength(riddle, data){
 function checkMatches(riddle, data){
     let numberOfMatches = 0;
     let matches = []
+    let correctMaterials = gatherCorrectItems(riddle)
     for(let i = 0; i < riddle.recipe.length; i++){
         for(let j = 0; j < riddle.recipe[i].length; j++){
+            let obj = {};
             if(riddle.recipe[i][j] == null && data.craftingRecipe[i][j] == null){
                 numberOfMatches++;
-                matches.push({null: "correct"})
+                obj[null] = "correct"
             }
             else if(riddle.recipe[i][j].includes(data.craftingRecipe[i][j])){
                 numberOfMatches++;
                 let key = data.craftingRecipe[i][j];
-                let obj = {};
                 obj[key] = "correct";
-                matches.push(obj);
-            };
+            }else{
+                if(correctMaterials.includes(data.craftingRecipe[i][j])){
+                    let key = data.craftingRecipe[i][j];
+                    obj[key] = "semi-correct";
+                    delete correctMaterials[correctMaterials.indexOf(key)]
+                }
+                else{
+                    let key = data.craftingRecipe[i][j];
+                    obj[key] = "wrong";
+                }
+            }
+            matches.push(obj);
         };
     };
     return {numberOfMatches: numberOfMatches, matches: matches};
 };
+
+function gatherCorrectItems(riddle){
+    let flatList = [];
+    for (let i = 0; i < riddle.recipe.length; i++) {
+        for (let j = 0; j < riddle.recipe[i].length; j++) {
+            if(Array.isArray(riddle.recipe[i][j])){
+                for(let k = 0; k < riddle.recipe[i][j].length; k++){
+                    flatList.push(riddle.recipe[i][j][k]);
+                }
+            }else{
+                flatList.push(riddle.recipe[i][j]);
+            }
+        }
+    }
+    return flatList;
+}
+
+function checkForOtherMatches(itemName, riddle){
+    let obj = {};
+    obj[itemName] = 
+    riddle.recipe.forEach(row => {
+        row.forEach(item => {
+            if(item != null && item.includes(itemName)){
+
+            }
+        })
+    })
+}
 
 function convertRecipes(){
     recipes = JSON.parse(fs.readFileSync("./recipes.json", 'utf8')).data;
@@ -156,7 +197,8 @@ async function createRiddle(socket){
     } while (!validateRiddle(riddle));
     riddles[socket.id] = {}
     riddles[socket.id]["riddle"] = riddle
-    riddles[socket.id]["tips"] = 99
+    riddles[socket.id]["tips"] = 0
+    riddles[socket.id]["tippedItems"] = []
     riddles[socket.id]["hints"] = generateHints(riddle)
     console.log(riddles[socket.id].riddle)
 }

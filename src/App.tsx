@@ -82,7 +82,7 @@ function findCraftingRecipe(craftingRecipe:string[][], originalRecipe:string[], 
           let craftedItem = document.createElement("img")
           craftedItem.src = i.image
           craftedItem.draggable = false
-          craftedItem.addEventListener("click", () => {chekcUserTip(craftingRecipe, originalRecipe)})
+          craftedItem.addEventListener("click", () => {chekcUserTip(i.name, craftingRecipe, originalRecipe)})
           item?.appendChild(craftedItem)
           getHints()
         }
@@ -91,8 +91,8 @@ function findCraftingRecipe(craftingRecipe:string[][], originalRecipe:string[], 
   });
 };
 
-function chekcUserTip(craftingRecipe:string[][], originalRecipe: string[]){
-  socket.emit("checkTip", {craftingRecipe: craftingRecipe, originalRecipe: originalRecipe})
+function chekcUserTip(craftedItem: string, craftingRecipe:string[][], originalRecipe: string[]){
+  socket.emit("checkTip", {craftedItem: craftedItem,craftingRecipe: craftingRecipe, originalRecipe: originalRecipe})
 }
 
 function convertRecipe(recipe:string[]){
@@ -147,7 +147,7 @@ function getHintContent(numberOfTips:number, hint:number | string | null, hintNu
       const updatedUsedHint = [...usedHint];
       updatedUsedHint[hintNumber] = true;
       setUsedHint(updatedUsedHint);
-    }}>Revail hint</button>
+    }}>Reveal hint</button>
   }
   return content
 }
