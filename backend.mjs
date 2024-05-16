@@ -29,8 +29,8 @@ app.use(express.static('public'));
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-      origin: "http://localhost:5173",
-      methods: ["GET", "POST"]
+        origin: "http://localhost:5173",
+        methods: ["GET", "POST"]
     }
 });
 
@@ -55,6 +55,14 @@ app.get("/recipes", (req, res) => {
 io.on('connection', async(socket) => {
     await createRiddle(socket)
 
+    socket.on("checkTip", (data) => {
+        let result = {};
+        if(riddles[socket.id].shapeless){
+            console.log("akurvaanyád")
+        }else{
+            socket.emit("checkTip" ,checkShapedRecipe(riddles[socket.id], data))
+        }
+    });
     socket.on("getHints", () => {
         let hints = {
             tips: riddles[socket.id].tips,
@@ -79,6 +87,57 @@ io.on('connection', async(socket) => {
         delete riddles[socket.id]
     })
 });
+
+function checkShapedRecipe(riddle, data){
+    console.log("Data:",data)
+    console.log("Riddle:",riddle.riddle)
+    let matrixLengthData = compareMatrixLength(riddle.riddle, data);
+    console.log(matrixLengthData);
+    if(matrixLengthData.same){
+        let matches = checkMatches(riddle.riddle, data);
+        if(matches.numberOfMatches == matrixLengthData.len){
+            return matches.matches;
+        }
+    }
+}
+
+function compareMatrixLength(riddle, data){
+    let sameLength = true;
+    let length = 0
+    if(riddle.recipe.length == data.craftingRecipe.length){
+        for(let i = 0; i< data.craftingRecipe.length; i++){
+            if(data.craftingRecipe[i].length != riddle.recipe[i].length){
+                sameLength = false;
+                break;
+            }
+            length+= data.craftingRecipe[i].length;
+        }
+    }else{
+        sameLength = false;
+    }
+    return {same: sameLength, len: length};
+}
+
+function checkMatches(riddle, data){
+    let numberOfMatches = 0;
+    let matches = []
+    for(let i = 0; i < riddle.recipe.length; i++){
+        for(let j = 0; j < riddle.recipe[i].length; j++){
+            if(riddle.recipe[i][j] == null && data.craftingRecipe[i][j] == null){
+                numberOfMatches++;
+                matches.push({null: "correct"})
+            }
+            else if(riddle.recipe[i][j].includes(data.craftingRecipe[i][j])){
+                numberOfMatches++;
+                let key = data.craftingRecipe[i][j];
+                let obj = {};
+                obj[key] = "correct";
+                matches.push(obj);
+            };
+        };
+    };
+    return {numberOfMatches: numberOfMatches, matches: matches};
+};
 
 function convertRecipes(){
     recipes = JSON.parse(fs.readFileSync("./recipes.json", 'utf8')).data;

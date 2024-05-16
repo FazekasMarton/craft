@@ -60,11 +60,12 @@ function craft(recipes:recipe[], items:item[]){
     }
     craftingTablecontent.push(itemName)
   }
+  let originalRecipe = craftingTablecontent
   let craftingRecipe = convertRecipe(craftingTablecontent)
-  findCraftingRecipe(craftingRecipe, recipes, item, items)
+  findCraftingRecipe(craftingRecipe, originalRecipe, recipes, item, items)
 }
 
-function findCraftingRecipe(craftingRecipe:string[][], recipes: recipe[], item:HTMLElement | null, items:item[]){
+function findCraftingRecipe(craftingRecipe:string[][], originalRecipe:string[], recipes: recipe[], item:HTMLElement | null, items:item[]){
   recipes.forEach(recipe => {
     let isRecipeCorrect = false
     if(craftingRecipe?.length == recipe.recipe?.length && craftingRecipe[0]?.length == recipe.recipe[0]?.length){
@@ -81,12 +82,17 @@ function findCraftingRecipe(craftingRecipe:string[][], recipes: recipe[], item:H
           let craftedItem = document.createElement("img")
           craftedItem.src = i.image
           craftedItem.draggable = false
+          craftedItem.addEventListener("click", () => {chekcUserTip(craftingRecipe, originalRecipe)})
           item?.appendChild(craftedItem)
           getHints()
         }
       });
     }
   });
+};
+
+function chekcUserTip(craftingRecipe:string[][], originalRecipe: string[]){
+  socket.emit("checkTip", {craftingRecipe: craftingRecipe, originalRecipe: originalRecipe})
 }
 
 function convertRecipe(recipe:string[]){
@@ -162,6 +168,10 @@ function App() {
 
   socket.on("hints", data => {
     setHints(data)
+  })
+
+  socket.on("checkTip", data => {
+    console.log(data);
   })
 
   useEffect(() => {
