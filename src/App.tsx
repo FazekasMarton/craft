@@ -65,7 +65,7 @@ function craft(recipes: recipe[], items: item[]) {
   findCraftingRecipe(craftingRecipe, originalRecipe, recipes, item, items)
 }
 
-function findCraftingRecipe(craftingRecipe: Array<Array<string | null>>, recipes: recipe[], item: HTMLElement | null, items: item[]) {
+function findCraftingRecipe(craftingRecipe: Array<Array<string | null>>, originalRecipe: Array<string | null>, recipes: recipe[], item: HTMLElement | null, items: item[]) {
   recipes.forEach(recipe => {
     let isRecipeCorrect = false
     if (recipe.shapeless) {
@@ -86,6 +86,10 @@ function findCraftingRecipe(craftingRecipe: Array<Array<string | null>>, recipes
       });
     }
   });
+}
+
+function chekcUserTip(craftedItem: string, craftingRecipe: Array<Array<string | null>>, originalRecipe: Array<string | null>){
+  socket.emit("checkTip", {craftedItem: craftedItem,craftingRecipe: craftingRecipe, originalRecipe: originalRecipe})
 }
 
 function shapeless(craftingRecipe: Array<Array<string | null>>, recipe: recipe) {

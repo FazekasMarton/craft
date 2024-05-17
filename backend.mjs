@@ -59,13 +59,12 @@ io.on('connection', async(socket) => {
         if(!riddles[socket.id]["tippedItems"].includes(data.craftedItem)){
             riddles[socket.id]["tips"]++;
             riddles[socket.id]["tippedItems"].push(data.craftedItem)
+            if(riddles[socket.id].riddle.shapeless){
+                socket.emit("checkTip" ,checkShapelessRecipe(riddles[socket.id].riddle, data))
+            }else{
+                socket.emit("checkTip" ,checkShapedRecipe(riddles[socket.id], data))
+            }
         };
-        let result = {};
-        if(riddles[socket.id].shapeless){
-            console.log("akurvaanyád")
-        }else{
-            socket.emit("checkTip" ,checkShapedRecipe(riddles[socket.id], data))
-        }
     });
     socket.on("getHints", () => {
         let hints = {
@@ -92,93 +91,42 @@ io.on('connection', async(socket) => {
     })
 });
 
-function checkShapedRecipe(riddle, data){
-    console.log("Data:",data)
-    console.log("Riddle:",riddle.riddle)
-    let matrixLengthData = compareMatrixLength(riddle.riddle, data);
-    console.log(matrixLengthData);
-    if(matrixLengthData.same){
-        let matches = checkMatches(riddle.riddle, data);
-        return matches.matches;
-    }
-}
-
-function compareMatrixLength(riddle, data){
-    let sameLength = true;
-    let length = 0
-    if(riddle.recipe.length == data.craftingRecipe.length){
-        for(let i = 0; i< data.craftingRecipe.length; i++){
-            if(data.craftingRecipe[i].length != riddle.recipe[i].length){
-                sameLength = false;
-                break;
-            }
-            length+= data.craftingRecipe[i].length;
-        }
-    }else{
-        sameLength = false;
-    }
-    return {same: sameLength, len: length};
-}
-
-function checkMatches(riddle, data){
-    let numberOfMatches = 0;
-    let matches = []
+function checkShapelessRecipe(riddle, data){
+    let result = [];
     let correctMaterials = gatherCorrectItems(riddle)
-    for(let i = 0; i < riddle.recipe.length; i++){
-        for(let j = 0; j < riddle.recipe[i].length; j++){
-            let obj = {};
-            if(riddle.recipe[i][j] == null && data.craftingRecipe[i][j] == null){
-                numberOfMatches++;
-                obj[null] = "correct"
-            }
-            else if(riddle.recipe[i][j].includes(data.craftingRecipe[i][j])){
-                numberOfMatches++;
-                let key = data.craftingRecipe[i][j];
+    console.log("original", data.originalRecipe)
+    data.originalRecipe.forEach(item => {
+        let obj = {};
+            let key = item;
+            if(item == null){
+                obj[key] = null
+            } else if(correctMaterials.includes(item)){
                 obj[key] = "correct";
-            }else{
-                if(correctMaterials.includes(data.craftingRecipe[i][j])){
-                    let key = data.craftingRecipe[i][j];
-                    obj[key] = "semi-correct";
-                    delete correctMaterials[correctMaterials.indexOf(key)]
-                }
-                else{
-                    let key = data.craftingRecipe[i][j];
-                    obj[key] = "wrong";
-                }
+            } else{
+                obj[key] = "wrong";
             }
-            matches.push(obj);
-        };
-    };
-    return {numberOfMatches: numberOfMatches, matches: matches};
-};
+            result.push(obj);
+    });
+    return result;
+}
 
 function gatherCorrectItems(riddle){
-    let flatList = [];
-    for (let i = 0; i < riddle.recipe.length; i++) {
-        for (let j = 0; j < riddle.recipe[i].length; j++) {
-            if(Array.isArray(riddle.recipe[i][j])){
-                for(let k = 0; k < riddle.recipe[i][j].length; k++){
-                    flatList.push(riddle.recipe[i][j][k]);
-                }
-            }else{
-                flatList.push(riddle.recipe[i][j]);
-            }
-        }
-    }
-    return flatList;
-}
-
-function checkForOtherMatches(itemName, riddle){
-    let obj = {};
-    obj[itemName] = 
+    let items = [];
     riddle.recipe.forEach(row => {
-        row.forEach(item => {
-            if(item != null && item.includes(itemName)){
-
-            }
-        })
-    })
-}
+        row.forEach(cell => {
+            if(Array.isArray(cell)){
+                cell.forEach(item => {
+                    if(item != null){
+                        items.push(item);
+                    };
+                });
+            }else{
+                items.push(cell);
+            };
+        });
+    });
+    return items;
+};
 
 function convertRecipes(){
     recipes = JSON.parse(fs.readFileSync("./recipes.json", 'utf8')).data;
