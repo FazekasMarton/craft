@@ -92,19 +92,67 @@ io.on('connection', async(socket) => {
 });
 
 function checkShapedRecipe(riddle, data){
-    createPossibleCombinations(riddle);
+    createPossibleCombinations(riddle, data);
 }
 
-function createPossibleCombinations(riddle){
-    let height = Math.round(3 / Number(riddle.recipe.length));
-    let width = 0;
-    riddle.recipe.forEach(len => {
-        if(len.length > width){
-            width = len.length;
+function createPossibleCombinations(riddle, data){
+    let matrices = generateMatrices(riddle.recipe);
+    let tip = restoreMatrix(data.originalRecipe);
+    let result = compareMatrices(matrices, tip);
+}
+
+function compareMatrices(matrices, tip){
+    let mostMatches = 0;
+    let matchingMatrix = [];
+    matrices.forEach(mat =>{
+        let matches = 0;
+        for(let i = 0; i < mat.length; i ++){
+            for(let j = 0; j < mat[i].length; j++){
+                if(mat[i][j] != null){
+                    if(Array.isArray(mat[i][j]) && mat[i][j].includes(tip[i][j])){
+                        matches++;
+                    } else if(mat[i][j] == tip[i][j]){
+                        matches++;
+                    };
+                };
+            };
+        };
+        if(matches > mostMatches){
+            mostMatches = matches;
+            matchingMatrix = mat;
         };
     });
-    width = Math.round(3 / Number(width));
-    console.log(width, ";", height)
+    return {matches: mostMatches, matchingMatrix: matchingMatrix};
+};
+
+function restoreMatrix(data){
+    let matrix = [];
+    for(let i = 0; i < data.length; i += 3){
+        matrix.push([data[i], data[i+1], data[i+2]]);
+    }
+    return matrix;
+}
+
+function generateMatrices(inputMatrix) {
+    let results = [];
+    let maxRows = 3 - inputMatrix.length + 1;
+    let maxCols = 3 - Math.max(...inputMatrix.map(row => row.length)) + 1;
+    for (let i = 0; i < maxRows; i++) {
+      for (let j = 0; j < maxCols; j++) {
+        results.push(fillMatrix(inputMatrix, i, j));
+      }
+    }
+    return results;
+}
+
+function fillMatrix(matrix, startRow, startCol) {
+    let filledMatrix = Array(3).fill(null).map(() => Array(3).fill(null));
+    for (let i = 0; i < matrix.length; i++) {
+      for (let j = 0; j < matrix[i].length; j++) {
+        filledMatrix[startRow + i][startCol + j] = matrix[i][j] || null;
+      }
+    }
+    return filledMatrix;
 }
 
 function checkShapelessRecipe(riddle, data){
