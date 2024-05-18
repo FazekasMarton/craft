@@ -28,7 +28,7 @@ interface hints {
   hint3: string | null
 }
 
-function drop(e: React.DragEvent, dropItem: HTMLElement | undefined, setDropItem: (element: HTMLElement) => void, recipes: recipe[], items: item[], drop: boolean) {
+function drop(e: React.DragEvent | React.MouseEvent, dropItem: HTMLElement | undefined, setDropItem: (element: HTMLElement) => void, recipes: recipe[], items: item[], drop: boolean) {
   if (e.currentTarget.childNodes.length == 0) {
     e.preventDefault()
     let newElement = dropItem as HTMLElement
@@ -44,6 +44,8 @@ function drop(e: React.DragEvent, dropItem: HTMLElement | undefined, setDropItem
       })
       e.currentTarget.appendChild(newElement)
     }
+  }else if(window.innerWidth < 920){
+    e.currentTarget.childNodes[0].remove()
   }
   craft(recipes, items)
 }
@@ -219,6 +221,20 @@ function getHintContent(numberOfTips: number, hint: number | string | null, hint
   return content
 }
 
+function selectItem(e: React.MouseEvent, setDropItem: (element: HTMLElement | undefined) => void){
+  setDropItem(e.currentTarget as HTMLElement)
+  const targetElement = e.currentTarget;
+  const parentElement = targetElement.parentElement;
+
+  if (parentElement && window.innerWidth < 920) {
+    const previouslySelected = document.getElementById("selected");
+    if (previouslySelected) {
+      previouslySelected.removeAttribute("id");
+    }
+    parentElement.id = "selected";
+  }
+}
+
 function App() {
   const [items, setItems] = useState<item[]>([]);
   const [recipes, setRecipes] = useState<recipe[]>([]);
@@ -259,7 +275,7 @@ function App() {
               return (<tr key={`row${i}`}>
                 {craftingTableSize.map((value, j) => {
                   let key = `slot${i * craftingTableSize.length + j}`
-                  return (<td key={key} className='cragtingTableSlot' id={key} onDragOver={(e) => { drop(e, dropItem, setDropItem, recipes, items, false) }} onDrop={(e) => { drop(e, dropItem, setDropItem, recipes, items, true) }}></td>)
+                  return (<td key={key} className='cragtingTableSlot' id={key} onDragOver={(e) => { drop(e, dropItem, setDropItem, recipes, items, false) }} onDrop={(e) => { drop(e, dropItem, setDropItem, recipes, items, true) }} onClick={(e) => {drop(e, dropItem, setDropItem, recipes, items, true)}}></td>)
                 })}
               </tr>)
             })}
@@ -293,7 +309,7 @@ function App() {
               if (item.name.toLocaleLowerCase().includes(search.toLocaleLowerCase())) display = "flex"
               return (
                 <div key={`itemSlot#${index}`} className='itemSlot' style={{ display: display }}>
-                  <img src={item.image} alt={item.name} title={item.name} draggable onDrag={(e) => { setDropItem(e.currentTarget) }} />
+                  <img src={item.image} alt={item.name} title={item.name} draggable onDrag={(e) => { setDropItem(e.currentTarget) }} onClick={(e) => {selectItem(e, setDropItem)}}/>
                 </div>
               )
             })}

@@ -249,6 +249,14 @@ img{
     justify-content: center;
   }
 
+  #selected{
+    background-color: rgba(59,132,39);
+    border-top: 2px solid rgba(101,157,80);
+    border-right: 2px solid rgba(28,63,19);
+    border-bottom: 2px solid rgba(22,79,14);
+    border-left: 2px solid rgba(66,115,52);
+  }
+
   #craftingTitle{
     font-size: 5vw;
   }
