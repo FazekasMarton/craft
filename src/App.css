@@ -27,6 +27,7 @@ html, body, #wrapper{
 #wrapper{
   display: grid;
   grid-template-columns: min-content auto;
+  grid-template-rows: min-content 1fr;
   grid-template-areas: 
   "craftingTable items"
   "tips items";
@@ -165,11 +166,26 @@ img{
 }
 
 #tips{
+  display: grid;
+  grid-template-rows: min-content auto;
   grid-area: tips;
+  gap: 15px;
   padding: 10px;
 }
 
-#hintsTitle{
+#tipsContainer{
+  display: grid;
+  grid-template-rows: min-content auto;
+}
+
+#tipsList{
+  display: flex;
+  flex-direction: column-reverse;
+  overflow-y: scroll;
+  height: 50vh;
+}
+
+#hintsTitle, #tipsTitle{
   font-size: 20px;
 }
 
@@ -247,4 +263,9 @@ table .correct{
   border-right: 2px solid rgba(255,254,254);
   border-bottom: 2px solid rgba(254,255,255);
   border-left: 2px solid rgba(57,56,56);
+}
+
+.tipCrafting td, .tippedItem{
+  width: 50px;
+  height: 50px;
 }
