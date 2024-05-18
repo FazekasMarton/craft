@@ -62,7 +62,7 @@ io.on('connection', async(socket) => {
             if(riddles[socket.id].riddle.shapeless){
                 socket.emit("checkTip" ,checkShapelessRecipe(riddles[socket.id].riddle, data))
             }else{
-                socket.emit("checkTip" ,checkShapedRecipe(riddles[socket.id].riddle, data))
+                socket.emit("checkTip" ,createPossibleCombinations(riddles[socket.id].riddle, data))
             }
         };
     });
@@ -91,18 +91,49 @@ io.on('connection', async(socket) => {
     })
 });
 
-function checkShapedRecipe(riddle, data){
-    createPossibleCombinations(riddle, data);
-}
-
 function createPossibleCombinations(riddle, data){
     let matrices = generateMatrices(riddle.recipe);
     let tip = restoreMatrix(data.originalRecipe);
     let result = compareMatrices(matrices, tip);
+    return markMatches(result, tip, riddle);
 }
 
+function markMatches(result, tip, riddle){
+    let materials = gatherCorrectItems(riddle);
+    let matches = [];
+    for (let i = 0; i < result.matchingMatrix.length; i++) {
+        for (let j = 0; j < result.matchingMatrix[i].length; j++) {
+            let obj = {};
+            if (tip[i][j] != null) {
+                let key = tip[i][j];
+                if ((Array.isArray(result.matchingMatrix[i][j]) && result.matchingMatrix[i][j].includes(key)) || result.matchingMatrix[i][j] == key) {
+                    obj[key] = "correct";
+                    materials.pop(key)
+                    console.log(materials)
+                } else {
+                    obj[key] = "waiting";
+                }
+            } else {
+                obj = { null: null };
+            }
+            matches.push(obj);
+        }
+    }
+    matches.forEach(match => {
+        let key = Object.keys(match)[0];
+        if (match[key] == "waiting") { 
+            if (materials.includes(key)) { 
+                match[key] = "semi-correct";
+            } else {
+                match[key] = "wrong";
+            }
+        }
+    });
+    return matches;
+};
+
 function compareMatrices(matrices, tip){
-    let mostMatches = 0;
+    let mostMatches = -1;
     let matchingMatrix = [];
     matrices.forEach(mat =>{
         let matches = 0;
