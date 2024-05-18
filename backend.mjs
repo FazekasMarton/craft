@@ -174,26 +174,32 @@ function convertRiddle(riddle){
             row++
         }
     });
-    for (let i = 0; i < craft_matrix.length; i++) {
-        let is_all_null = true
-        craft_matrix[i].forEach(material => {
-            if(material != null) is_all_null &= false
-        });
-        if(is_all_null){
-            craft_matrix.splice(i, 1)
-            i--
-        }
-    }
-    for (let i = 0; i < craft_matrix[0].length; i++) {
-        let is_all_null = true
-        for (let j = 0; j < craft_matrix.length; j++) {
-            if(craft_matrix[j][i] != null) is_all_null &= false
-        }
-        if(is_all_null){
-            for (let j = 0; j < craft_matrix.length; j++) {
-                craft_matrix[j].splice(i, 1)
+    for (let a = 0; a < 2; a++) {
+        for (let i = 0; i < craft_matrix.length; i++) {
+            let is_all_null = true
+            if (i != 1 || craft_matrix.length < 3) {
+                craft_matrix[i].forEach(material => {
+                    if(material != null) is_all_null &= false
+                });
+                if(is_all_null){
+                    craft_matrix.splice(i, 1)
+                    i--
+                }
             }
-            i--
+        }
+        for (let i = 0; i < craft_matrix[0].length; i++) {
+            let is_all_null = true
+            if (i != 1 || craft_matrix[0].length < 3) {
+                for (let j = 0; j < craft_matrix.length; j++) {
+                    if(craft_matrix[j][i] != null) is_all_null &= false
+                }
+                if(is_all_null){
+                    for (let j = 0; j < craft_matrix.length; j++) {
+                        craft_matrix[j].splice(i, 1)
+                    }
+                    i--
+                }
+            }
         }
     }
     riddle.recipe = craft_matrix
