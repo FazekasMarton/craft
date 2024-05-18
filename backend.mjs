@@ -58,12 +58,15 @@ io.on('connection', async(socket) => {
     socket.on("checkTip", (data) => {
         if(!riddles[socket.id]["tippedItems"].includes(data.craftedItem)){
             riddles[socket.id]["tips"]++;
-            riddles[socket.id]["tippedItems"].push(data.craftedItem)
+            riddles[socket.id]["tippedItems"].push(data.craftedItem);
+            let result = [];
             if(riddles[socket.id].riddle.shapeless){
-                socket.emit("checkTip" ,checkShapelessRecipe(riddles[socket.id].riddle, data))
+                result = checkShapelessRecipe(riddles[socket.id].riddle, data);
             }else{
-                socket.emit("checkTip" ,createPossibleCombinations(riddles[socket.id].riddle, data))
+                result = createPossibleCombinations(riddles[socket.id].riddle, data);
             }
+            riddles[socket.id]["tippedRecipes"].push(result);
+            socket.emit("checkTip", {tippedRecipes: riddles[socket.id]["tippedRecipes"], tippedItems: riddles[socket.id]["tippedItems"]});
         };
     });
     socket.on("getHints", () => {
@@ -243,6 +246,7 @@ async function createRiddle(socket){
     riddles[socket.id]["tips"] = 0
     riddles[socket.id]["tippedItems"] = []
     riddles[socket.id]["hints"] = generateHints(riddle)
+    riddles[socket.id]["tippedRecipes"] = [];
     console.log(riddles[socket.id].riddle)
 }
 

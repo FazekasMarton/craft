@@ -28,6 +28,11 @@ interface hints {
   hint3: string | null
 }
 
+interface tips {
+  tippedRecipes: [],
+  tippedItems: []
+}
+
 function drop(e: React.DragEvent, dropItem: HTMLElement | undefined, setDropItem: (element: HTMLElement) => void, recipes: recipe[], items: item[], drop: boolean) {
   if (e.currentTarget.childNodes.length == 0) {
     e.preventDefault()
@@ -225,6 +230,16 @@ function getHintContent(numberOfTips: number, hint: number | string | null, hint
   return content
 }
 
+function findImage(name : string, items : item[]){
+  let image : string = "";
+  items.forEach(item => {
+    if(item.name == name){
+      image = item.image;
+    }
+  })
+  return image;
+}
+
 function App() {
   const [items, setItems] = useState<item[]>([]);
   const [recipes, setRecipes] = useState<recipe[]>([]);
@@ -238,14 +253,15 @@ function App() {
   });
   const [usedHints, setUsedHints] = useState([false, false, false]);
   const craftingTableSize = new Array(3).fill(null)
+  const [result, setResult] = useState<tips>();
 
   socket.on("hints", data => {
-    setHints(data)
-  })
+    setHints(data);
+  });
 
   socket.on("checkTip", data => {
-    console.log(data);
-  })
+    setResult(data);
+  });
 
   useEffect(() => {
     fetch("http://localhost:6969/items")
@@ -285,6 +301,39 @@ function App() {
             <div>{getHintContent(hints.tips, hints.hint1, 1, usedHints, setUsedHints)}</div>
             <div>{getHintContent(hints.tips, hints.hint2, 2, usedHints, setUsedHints)}</div>
             <div>{getHintContent(hints.tips, hints.hint3, 3, usedHints, setUsedHints)}</div>
+          </div>
+        </div>
+        <div id='tipsContainer'>
+          <div id='tipsTitle'>Tips:</div>
+            <div id='tipsList'>
+            {result?.tippedRecipes.map((item, index) => {
+              return (
+                <div id={`craftingTable${index}`} key={`craftingTable${index}`} className='tipCrafting'>
+                  <table>
+                    <tbody>
+                      {craftingTableSize.map((value, i) => {
+                        return (
+                          <tr key={`row${index}_${i}`}>
+                            {craftingTableSize.map((value, j) => {
+                              let key = `slot${index}_${i * craftingTableSize.length + j}`
+                              return (
+                                <td key={key} className={`craftingTableSlot ${item[i * craftingTableSize.length + j][Object.keys(item[i * craftingTableSize.length + j])[0]]}`}>
+                                  <img src={findImage(String(Object.keys(item[i * craftingTableSize.length + j])[0]), items)}></img>
+                                </td>
+                              )
+                            })}
+                          </tr>
+                        )
+                      })}
+                    </tbody>
+                  </table>
+                  <img id={`craftingArrow${index}`} src={craftingTableArrow} alt="arrow" />
+                  <div id={`item${index}`} className='tippedItem'>
+                    <img src={findImage(result?.tippedItems[index],items)}></img>
+                  </div>
+                </div>
+              )
+            })}
           </div>
         </div>
       </div>
