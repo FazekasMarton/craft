@@ -62,7 +62,7 @@ io.on('connection', async(socket) => {
             if(riddles[socket.id].riddle.shapeless){
                 socket.emit("checkTip" ,checkShapelessRecipe(riddles[socket.id].riddle, data))
             }else{
-                socket.emit("checkTip" ,checkShapedRecipe(riddles[socket.id], data))
+                socket.emit("checkTip" ,checkShapedRecipe(riddles[socket.id].riddle, data))
             }
         };
     });
@@ -90,6 +90,22 @@ io.on('connection', async(socket) => {
         delete riddles[socket.id]
     })
 });
+
+function checkShapedRecipe(riddle, data){
+    createPossibleCombinations(riddle);
+}
+
+function createPossibleCombinations(riddle){
+    let height = Math.round(3 / Number(riddle.recipe.length));
+    let width = 0;
+    riddle.recipe.forEach(len => {
+        if(len.length > width){
+            width = len.length;
+        };
+    });
+    width = Math.round(3 / Number(width));
+    console.log(width, ";", height)
+}
 
 function checkShapelessRecipe(riddle, data){
     let result = [];
