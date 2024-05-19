@@ -8,10 +8,9 @@ import { tips } from './interfaces/tips.tsx';
 import io from 'socket.io-client';
 
 const url:string = getBackendURL()
-
 const socket = io(url)
 
-function drop(e: React.DragEvent | React.MouseEvent, dropItem: HTMLElement | undefined, setDropItem: (element: HTMLElement) => void, recipes: recipe[], items: item[], drop: boolean, result: tips | undefined) {
+function drop(e: React.DragEvent | React.MouseEvent, dropItem: HTMLElement | undefined, setDropItem: (element: HTMLElement) => void, recipes: recipe[], items: item[], drop: boolean, result: tips | undefined, pc: boolean) {
   if (e.currentTarget.childNodes.length == 0 && dropItem != undefined && !result?.solved) {
     e.preventDefault()
     let newElement = dropItem as HTMLElement
@@ -27,7 +26,7 @@ function drop(e: React.DragEvent | React.MouseEvent, dropItem: HTMLElement | und
       })
       e.currentTarget.appendChild(newElement)
     }
-  }else if(window.innerWidth < 920){
+  }else if(!pc){
     e.currentTarget.childNodes[0].remove()
   }
   craft(recipes, items)
@@ -215,11 +214,11 @@ function findImage(name : string, items : item[]){
   return image;
 }
   
-function selectItem(e: React.MouseEvent, setDropItem: (element: HTMLElement | undefined) => void){
+function selectItem(e: React.MouseEvent, setDropItem: (element: HTMLElement | undefined) => void, pc: boolean){
   const targetElement = e.currentTarget;
   const parentElement = targetElement.parentElement;
   
-  if (parentElement && window.innerWidth < 920) {
+  if (parentElement && !pc) {
     setDropItem(e.currentTarget as HTMLElement)
     const previouslySelected = document.getElementById("selected");
     if (previouslySelected) {
@@ -272,7 +271,15 @@ function getAchievement(result: tips | undefined, items: item[]){
   return(achievement)
 }
 
+function checkPC(setPC: (value: boolean) => void){
+  const agent = navigator.userAgent.toLocaleLowerCase()
+  const pc = !/mobile|android|iphone|ipod|blackberry|windows phone|tablet|ipad|macintosh/i.test(agent)
+  setPC(pc)
+  return pc
+}
+
 function App() {
+  const [pc, setPC] = useState(checkPC(() => {}));
   const [items, setItems] = useState<item[]>([]);
   const [recipes, setRecipes] = useState<recipe[]>([]);
   const [search, setSearch] = useState("");
@@ -293,6 +300,7 @@ function App() {
     if(selectedElement != undefined){
       selectedElement.removeAttribute("id")
     }
+    checkPC(setPC)
   })
 
   socket.on("hints", data => {
@@ -329,7 +337,7 @@ function App() {
               return (<tr key={`row${i}`}>
                 {craftingTableSize.map((_, j) => {
                   let key = `slot${i * craftingTableSize.length + j}`
-                  return (<td key={key} className='cragtingTableSlot' id={key} onDragOver={(e) => { drop(e, dropItem, setDropItem, recipes, items, false, result) }} onDrop={(e) => { drop(e, dropItem, setDropItem, recipes, items, true, result) }} onClick={(e) => {if(window.innerWidth < 920) drop(e, dropItem, setDropItem, recipes, items, true, result)}}></td>)
+                  return (<td key={key} className='cragtingTableSlot' id={key} onDragOver={(e) => { drop(e, dropItem, setDropItem, recipes, items, false, result, pc) }} onDrop={(e) => { drop(e, dropItem, setDropItem, recipes, items, true, result, pc) }} onClick={(e) => {if(!pc) drop(e, dropItem, setDropItem, recipes, items, true, result, pc)}}></td>)
                 })}
               </tr>)
             })}
@@ -371,7 +379,7 @@ function App() {
                       })}
                     </tbody>
                   </table>
-                  <img id={`craftingArrow${index}`} src={craftingTableArrow} alt="arrow" />
+                  <img id={`craftingArrow${index}`} src={craftingTableArrow} alt="arrow" className='craftingArrow'/>
                   <div id={`item${index}`} className='tippedItem'>
                     <img src={findImage(result?.tippedItems[index],items)}></img>
                   </div>
@@ -396,7 +404,7 @@ function App() {
               if (item.name.toLocaleLowerCase().includes(search.toLocaleLowerCase())) display = "flex"
               return (
                 <div key={`itemSlot#${index}`} className='itemSlot' style={{ display: display }}>
-                  <img src={item.image} alt={item.name} title={item.name} draggable onDrag={(e) => { setDropItem(e.currentTarget) }} onClick={(e) => {selectItem(e, setDropItem)}}/>
+                  <img src={item.image} alt={item.name} title={item.name} draggable onDrag={(e) => { setDropItem(e.currentTarget) }} onClick={(e) => {selectItem(e, setDropItem, pc)}}/>
                 </div>
               )
             })}
