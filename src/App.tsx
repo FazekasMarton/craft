@@ -1,40 +1,15 @@
 import React, { useState, useEffect } from 'react'
 import craftingTableArrow from './assets/craftingtablearrow.png'
 import searchicon from './assets/searchicon.png'
+import { item } from './interfaces/item.tsx';
+import { recipe } from './interfaces/recipe.tsx';
+import { hints } from './interfaces/hints.tsx';
+import { tips } from './interfaces/tips.tsx';
 import io from 'socket.io-client';
 
 const url:string = getBackendURL()
 
 const socket = io(url)
-
-interface item {
-  name: string,
-  namespacedId: string,
-  description: string,
-  image: string,
-  renewable: boolean,
-  stackSize: number
-}
-
-interface recipe {
-  item: string,
-  quantity: number,
-  recipe: Array<Array<null | string | Array<string | null>>>
-  shapeless: boolean
-}
-
-interface hints {
-  tips: number,
-  hint1: string | null,
-  hint2: string | null,
-  hint3: string | null
-}
-
-interface tips {
-  tippedRecipes: [],
-  tippedItems: []
-  solved: boolean
-}
 
 function drop(e: React.DragEvent | React.MouseEvent, dropItem: HTMLElement | undefined, setDropItem: (element: HTMLElement) => void, recipes: recipe[], items: item[], drop: boolean, result: tips | undefined) {
   if (e.currentTarget.childNodes.length == 0 && dropItem != undefined && !result?.solved) {
