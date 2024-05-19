@@ -65,7 +65,7 @@ io.on('connection', async(socket) => {
                 result = createPossibleCombinations(riddles[socket.id].riddle, data);
             }
             riddles[socket.id]["tippedRecipes"].push(result);
-            socket.emit("checkTip", {tippedRecipes: riddles[socket.id]["tippedRecipes"], tippedItems: riddles[socket.id]["tippedItems"]});
+            socket.emit("checkTip", {tippedRecipes: riddles[socket.id]["tippedRecipes"], tippedItems: riddles[socket.id]["tippedItems"], solved: false});
             getHints(socket)
         };
     });

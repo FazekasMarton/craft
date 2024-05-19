@@ -33,10 +33,11 @@ interface hints {
 interface tips {
   tippedRecipes: [],
   tippedItems: []
+  solved: boolean
 }
 
-function drop(e: React.DragEvent | React.MouseEvent, dropItem: HTMLElement | undefined, setDropItem: (element: HTMLElement) => void, recipes: recipe[], items: item[], drop: boolean) {
-  if (e.currentTarget.childNodes.length == 0 && dropItem != undefined) {
+function drop(e: React.DragEvent | React.MouseEvent, dropItem: HTMLElement | undefined, setDropItem: (element: HTMLElement) => void, recipes: recipe[], items: item[], drop: boolean, result: tips | undefined) {
+  if (e.currentTarget.childNodes.length == 0 && dropItem != undefined && !result?.solved) {
     e.preventDefault()
     let newElement = dropItem as HTMLElement
     if (e.buttons == 2 || e.buttons == 3 || drop) {
@@ -283,6 +284,20 @@ function scrollTop(){
   }
 }
 
+function getAchievement(result: tips | undefined, items: item[]){
+  let achievement = <></>
+  if(result?.solved){
+    let item = result.tippedItems[result.tippedItems.length-1]
+    achievement = <div id='achievement'>
+      <img id='achievementImage' src={findImage(item, items)} alt="solvedRidle" />
+      <div id='achievementTitle'>Challenge Complete!</div>
+      <button id='achievementButton' onClick={() => {location.reload()}}>New Game</button>
+      <div id='achievementText'>Solve The Riddle: {item}</div>
+    </div>
+  }
+  return(achievement)
+}
+
 function App() {
   const [items, setItems] = useState<item[]>([]);
   const [recipes, setRecipes] = useState<recipe[]>([]);
@@ -338,7 +353,7 @@ function App() {
               return (<tr key={`row${i}`}>
                 {craftingTableSize.map((_, j) => {
                   let key = `slot${i * craftingTableSize.length + j}`
-                  return (<td key={key} className='cragtingTableSlot' id={key} onDragOver={(e) => { drop(e, dropItem, setDropItem, recipes, items, false) }} onDrop={(e) => { drop(e, dropItem, setDropItem, recipes, items, true) }} onClick={(e) => {if(window.innerWidth < 920) drop(e, dropItem, setDropItem, recipes, items, true)}}></td>)
+                  return (<td key={key} className='cragtingTableSlot' id={key} onDragOver={(e) => { drop(e, dropItem, setDropItem, recipes, items, false, result) }} onDrop={(e) => { drop(e, dropItem, setDropItem, recipes, items, true, result) }} onClick={(e) => {if(window.innerWidth < 920) drop(e, dropItem, setDropItem, recipes, items, true, result)}}></td>)
                 })}
               </tr>)
             })}
@@ -412,6 +427,7 @@ function App() {
           </div>
         </div>
       </div>
+      {getAchievement(result, items)}
     </>
   )
 }
