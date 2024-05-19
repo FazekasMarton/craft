@@ -31,7 +31,6 @@ html, body, #wrapper{
   grid-template-areas: 
   "craftingTable items"
   "tips items";
-  gap: 20px;
 }
 
 img{
@@ -50,8 +49,8 @@ img{
   justify-content: center;
   width: min-content;
   height: min-content;
-  padding: 20px;
-  gap: 0 20px;
+  padding: 3vmin;
+  gap: 0 2vmin;
 }
 
 .tipCrafting{
@@ -61,7 +60,7 @@ img{
 
 #craftingTitle{
   text-align: start;
-  font-size: 40px;
+  font-size: 5vmin;
   grid-area: title;
 }
 
@@ -73,8 +72,8 @@ img{
 }
 
 #craftingTable td, #item, .itemSlot, .tipCrafting td, .tippedItem{
-  width: 64px;
-  height: 64px;
+  width: 8vmin;
+  height: 8vmin;
   border-top: 2px solid rgba(51,50,50);
   border-right: 2px solid rgba(255,254,254);
   border-bottom: 2px solid rgba(254,255,255);
@@ -89,13 +88,13 @@ img{
 
 #craftingArrow{
   grid-area: arrow;
-  height: 64px;
+  height: 8vmin;
 }
 
 #item, .tippedItem{
   grid-area: item;
-  width: 80px;
-  height: 80px;
+  width: 10vmin;
+  height: 10vmin;
 }
 
 #items{
@@ -104,8 +103,8 @@ img{
   display: grid;
   grid-template-rows: min-content auto;
   width: 100%;
-  height: 98vh;
-  padding-bottom: 2vh;
+  height: 98vmin;
+  padding-bottom: 2vmin;
 }
 
 .itemSlot{
@@ -167,26 +166,27 @@ img{
 
 #tips{
   display: grid;
-  grid-template-rows: min-content auto;
+  grid-template-rows: min-content min-content;
   grid-area: tips;
   gap: 15px;
   padding: 10px;
+  align-self: end;
 }
 
 #tipsContainer{
   display: grid;
-  grid-template-rows: min-content auto;
+  grid-template-rows: min-content min-content;
 }
 
 #tipsList{
   display: flex;
   flex-direction: column-reverse;
   overflow-y: scroll;
-  height: 50vh;
+  height: 33vh;
 }
 
 #hintsTitle, #tipsTitle{
-  font-size: 20px;
+  font-size: 2vh;
 }
 
 #hints{
@@ -196,7 +196,7 @@ img{
 
 #hints > div{
   width: 30%;
-  height: 80px;
+  height: 10vh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -213,7 +213,7 @@ img{
   width: 100%;
   height: 100%;
   font-family: MinecraftRegular;
-  font-size: 18px;
+  font-size: 2vmin;
 }
 
 #hints button:hover{
@@ -238,7 +238,7 @@ img{
   align-items: center;
   justify-content: center;
   text-align: center;
-  font-size: 15px;
+  font-size: 2vmin;
 }
 
 table .wrong{
@@ -266,14 +266,14 @@ table .correct{
 }
 
 .tipCrafting td, .tippedItem{
-  width: 50px;
-  height: 50px;
+  width: 5vmin;
+  height: 5vmin;
 }
   
 @media only screen and (max-width: 920px) {
   #wrapper{
     grid-template-columns: 1fr;
-    grid-template-rows: auto min-content 1fr;
+    grid-template-rows: auto min-content auto;
     grid-template-areas: 
     "items"
     "craftingTable"
@@ -318,5 +318,14 @@ table .correct{
 
   #hints button{
     font-size: 4vw;
+  }
+
+  #tipsList{
+    height: 20vh;
+  }
+
+  .tipCrafting td, .tippedItem{
+    width: 10vmin;
+    height: 10vmin;
   }
 }

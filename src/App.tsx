@@ -251,6 +251,17 @@ function selectItem(e: React.MouseEvent, setDropItem: (element: HTMLElement | un
   }
 }
 
+function clearInputs(){
+  for (let i = 0; i < 9; i++) {
+    const element = document.getElementById(`slot${i}`);
+    if (element) {
+      element.innerHTML = "";
+    }
+  }
+  let item = document.getElementById("item")
+  item?.childNodes[0]?.remove()
+}
+
 function App() {
   const [items, setItems] = useState<item[]>([]);
   const [recipes, setRecipes] = useState<recipe[]>([]);
@@ -272,6 +283,7 @@ function App() {
 
   socket.on("checkTip", data => {
     setResult(data);
+    clearInputs()
   });
 
   useEffect(() => {
