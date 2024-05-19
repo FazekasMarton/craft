@@ -273,9 +273,14 @@ function getBackendURL(){
 }
 
 function scrollTop(){
-  const tipsList = document.getElementById('tipsList');
-  const lastTip = tipsList?.lastElementChild;
-  lastTip?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+  const tipsList: HTMLElement | null = document.getElementById('tipsList');
+  if (tipsList) {
+    //tipsList.scrollTop = tipsList.scrollHeight*-1;
+    tipsList.scrollTo({
+      top: tipsList.scrollHeight*-1,
+      behavior: "smooth"
+    })
+  }
 }
 
 function App() {
