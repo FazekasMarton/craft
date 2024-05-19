@@ -51,6 +51,7 @@ img{
   height: min-content;
   padding: 3vmin;
   gap: 0 2vmin;
+  margin: auto;
 }
 
 .tipCrafting{
@@ -318,6 +319,10 @@ table .correct{
 
   #hints button{
     font-size: 4vw;
+  }
+
+  .hint{
+    font-size: 3.5vw;
   }
 
   #tipsList{

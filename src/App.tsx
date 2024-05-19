@@ -272,6 +272,12 @@ function getBackendURL(){
   return url
 }
 
+function scrollTop(){
+  const tipsList = document.getElementById('tipsList');
+  const lastTip = tipsList?.lastElementChild;
+  lastTip?.scrollIntoView({ behavior: 'smooth', block: 'end' });
+}
+
 function App() {
   const [items, setItems] = useState<item[]>([]);
   const [recipes, setRecipes] = useState<recipe[]>([]);
@@ -323,6 +329,7 @@ function App() {
         <table>
           <tbody>
             {craftingTableSize.map((_, i) => {
+              scrollTop()
               return (<tr key={`row${i}`}>
                 {craftingTableSize.map((_, j) => {
                   let key = `slot${i * craftingTableSize.length + j}`
