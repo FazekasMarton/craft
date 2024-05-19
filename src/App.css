@@ -27,6 +27,7 @@ html, body, #wrapper{
 #wrapper{
   display: grid;
   grid-template-columns: min-content auto;
+  grid-template-rows: min-content 1fr;
   grid-template-areas: 
   "craftingTable items"
   "tips items";
@@ -38,7 +39,7 @@ img{
   max-height: 58px;
 }
 
-#craftingTable{
+#craftingTable, .tipCrafting{
   grid-area: craftingTable;
   display: grid;
   align-items: center;
@@ -53,20 +54,25 @@ img{
   gap: 0 20px;
 }
 
+.tipCrafting{
+  grid-template-areas: 
+  "craft arrow item";
+}
+
 #craftingTitle{
   text-align: start;
   font-size: 40px;
   grid-area: title;
 }
 
-#craftingTable > table{
+#craftingTable > table, .tipCrafting > table{
   grid-area: craft;
   width: max-content;
   padding-left: 5px;
   border-collapse: collapse;
 }
 
-#craftingTable td, #item, .itemSlot{
+#craftingTable td, #item, .itemSlot, .tipCrafting td, .tippedItem{
   width: 64px;
   height: 64px;
   border-top: 2px solid rgba(51,50,50);
@@ -86,7 +92,7 @@ img{
   height: 64px;
 }
 
-#item{
+#item, .tippedItem{
   grid-area: item;
   width: 80px;
   height: 80px;
@@ -160,11 +166,26 @@ img{
 }
 
 #tips{
+  display: grid;
+  grid-template-rows: min-content auto;
   grid-area: tips;
+  gap: 15px;
   padding: 10px;
 }
 
-#hintsTitle{
+#tipsContainer{
+  display: grid;
+  grid-template-rows: min-content auto;
+}
+
+#tipsList{
+  display: flex;
+  flex-direction: column-reverse;
+  overflow-y: scroll;
+  height: 50vh;
+}
+
+#hintsTitle, #tipsTitle{
   font-size: 20px;
 }
 
@@ -220,6 +241,35 @@ img{
   font-size: 15px;
 }
 
+table .wrong{
+  background-color: rgb(176, 46, 38);
+  border-top: 2px solid rgba(51,50,50);
+  border-right: 2px solid rgba(255,254,254);
+  border-bottom: 2px solid rgba(254,255,255);
+  border-left: 2px solid rgba(57,56,56);
+}
+
+table .semi-correct{
+  background-color: rgb(255, 170, 0);
+  border-top: 2px solid rgba(51,50,50);
+  border-right: 2px solid rgba(255,254,254);
+  border-bottom: 2px solid rgba(254,255,255);
+  border-left: 2px solid rgba(57,56,56);
+}
+
+table .correct{
+  background-color: rgba(59,132,39);
+  border-top: 2px solid rgba(51,50,50);
+  border-right: 2px solid rgba(255,254,254);
+  border-bottom: 2px solid rgba(254,255,255);
+  border-left: 2px solid rgba(57,56,56);
+}
+
+.tipCrafting td, .tippedItem{
+  width: 50px;
+  height: 50px;
+}
+  
 @media only screen and (max-width: 920px) {
   #wrapper{
     grid-template-columns: 1fr;

@@ -28,8 +28,8 @@ app.use(express.static('public'));
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-      origin: "http://localhost:5173",
-      methods: ["GET", "POST"]
+        origin: "http://localhost:5173",
+        methods: ["GET", "POST"]
     }
 });
 
@@ -54,6 +54,20 @@ app.get("/recipes", (req, res) => {
 io.on('connection', async(socket) => {
     await createRiddle(socket)
 
+    socket.on("checkTip", (data) => {
+        if(!riddles[socket.id]["tippedItems"].includes(data.craftedItem)){
+            riddles[socket.id]["tips"]++;
+            riddles[socket.id]["tippedItems"].push(data.craftedItem);
+            let result = [];
+            if(riddles[socket.id].riddle.shapeless){
+                result = checkShapelessRecipe(riddles[socket.id].riddle, data);
+            }else{
+                result = createPossibleCombinations(riddles[socket.id].riddle, data);
+            }
+            riddles[socket.id]["tippedRecipes"].push(result);
+            socket.emit("checkTip", {tippedRecipes: riddles[socket.id]["tippedRecipes"], tippedItems: riddles[socket.id]["tippedItems"]});
+        };
+    });
     socket.on("getHints", () => {
         let hints = {
             tips: riddles[socket.id].tips,
@@ -78,6 +92,138 @@ io.on('connection', async(socket) => {
         delete riddles[socket.id]
     })
 });
+
+function createPossibleCombinations(riddle, data){
+    let matrices = generateMatrices(riddle.recipe);
+    let tip = restoreMatrix(data.originalRecipe);
+    let result = compareMatrices(matrices, tip);
+    return markMatches(result, tip, riddle);
+}
+
+function markMatches(result, tip, riddle){
+    let materials = gatherCorrectItems(riddle);
+    let matches = [];
+    for (let i = 0; i < result.matchingMatrix.length; i++) {
+        for (let j = 0; j < result.matchingMatrix[i].length; j++) {
+            let obj = {};
+            if (tip[i][j] != null) {
+                let key = tip[i][j];
+                if ((Array.isArray(result.matchingMatrix[i][j]) && result.matchingMatrix[i][j].includes(key)) || result.matchingMatrix[i][j] == key) {
+                    obj[key] = "correct";
+                    materials.pop(key)
+                    console.log(materials)
+                } else {
+                    obj[key] = "waiting";
+                }
+            } else {
+                obj = { null: null };
+            }
+            matches.push(obj);
+        }
+    }
+    matches.forEach(match => {
+        let key = Object.keys(match)[0];
+        if (match[key] == "waiting") { 
+            if (materials.includes(key)) { 
+                match[key] = "semi-correct";
+            } else {
+                match[key] = "wrong";
+            }
+        }
+    });
+    return matches;
+};
+
+function compareMatrices(matrices, tip){
+    let mostMatches = -1;
+    let matchingMatrix = [];
+    matrices.forEach(mat =>{
+        let matches = 0;
+        for(let i = 0; i < mat.length; i ++){
+            for(let j = 0; j < mat[i].length; j++){
+                if(mat[i][j] != null){
+                    if(Array.isArray(mat[i][j]) && mat[i][j].includes(tip[i][j])){
+                        matches++;
+                    } else if(mat[i][j] == tip[i][j]){
+                        matches++;
+                    };
+                };
+            };
+        };
+        if(matches > mostMatches){
+            mostMatches = matches;
+            matchingMatrix = mat;
+        };
+    });
+    return {matches: mostMatches, matchingMatrix: matchingMatrix};
+};
+
+function restoreMatrix(data){
+    let matrix = [];
+    for(let i = 0; i < data.length; i += 3){
+        matrix.push([data[i], data[i+1], data[i+2]]);
+    }
+    return matrix;
+}
+
+function generateMatrices(inputMatrix) {
+    let results = [];
+    let maxRows = 3 - inputMatrix.length + 1;
+    let maxCols = 3 - Math.max(...inputMatrix.map(row => row.length)) + 1;
+    for (let i = 0; i < maxRows; i++) {
+      for (let j = 0; j < maxCols; j++) {
+        results.push(fillMatrix(inputMatrix, i, j));
+      }
+    }
+    return results;
+}
+
+function fillMatrix(matrix, startRow, startCol) {
+    let filledMatrix = Array(3).fill(null).map(() => Array(3).fill(null));
+    for (let i = 0; i < matrix.length; i++) {
+      for (let j = 0; j < matrix[i].length; j++) {
+        filledMatrix[startRow + i][startCol + j] = matrix[i][j] || null;
+      }
+    }
+    return filledMatrix;
+}
+
+function checkShapelessRecipe(riddle, data){
+    let result = [];
+    let correctMaterials = gatherCorrectItems(riddle)
+    console.log("original", data.originalRecipe)
+    data.originalRecipe.forEach(item => {
+        let obj = {};
+            let key = item;
+            if(item == null){
+                obj[key] = null
+            } else if(correctMaterials.includes(item)){
+                obj[key] = "correct";
+            } else{
+                obj[key] = "wrong";
+            }
+            result.push(obj);
+    });
+    return result;
+}
+
+function gatherCorrectItems(riddle){
+    let items = [];
+    riddle.recipe.forEach(row => {
+        row.forEach(cell => {
+            if(Array.isArray(cell)){
+                cell.forEach(item => {
+                    if(item != null){
+                        items.push(item);
+                    };
+                });
+            }else{
+                items.push(cell);
+            };
+        });
+    });
+    return items;
+};
 
 async function getData(url){
     let return_data = {}
@@ -105,8 +251,10 @@ async function createRiddle(socket){
     } while (!validateRiddle(riddle));
     riddles[socket.id] = {}
     riddles[socket.id]["riddle"] = riddle
-    riddles[socket.id]["tips"] = 99
+    riddles[socket.id]["tips"] = 0
+    riddles[socket.id]["tippedItems"] = []
     riddles[socket.id]["hints"] = await generateHints(riddle)
+    riddles[socket.id]["tippedRecipes"] = [];
     console.log(riddles[socket.id].riddle)
 }
 
