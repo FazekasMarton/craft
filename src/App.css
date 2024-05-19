@@ -219,3 +219,54 @@ img{
   text-align: center;
   font-size: 15px;
 }
+
+@media only screen and (max-width: 920px) {
+  #wrapper{
+    grid-template-columns: 1fr;
+    grid-template-rows: auto min-content 1fr;
+    grid-template-areas: 
+    "items"
+    "craftingTable"
+    "tips";
+    gap: 0;
+  }
+
+  #items{
+    height: 30vh;
+  }
+
+  #itemBar{
+    flex-direction: column;
+    padding: 0;
+  }
+
+  #inventory{
+    margin-top: 5px;
+    width: 100vw;
+  }
+
+  #slots{
+    justify-content: center;
+  }
+
+  #selected{
+    background-color: rgba(59,132,39);
+    border-top: 2px solid rgba(101,157,80);
+    border-right: 2px solid rgba(28,63,19);
+    border-bottom: 2px solid rgba(22,79,14);
+    border-left: 2px solid rgba(66,115,52);
+  }
+
+  #craftingTitle{
+    font-size: 5vw;
+  }
+
+  #craftingTable td, #item, .itemSlot{
+    width: 10vw;
+    height: 10vw;
+  }
+
+  #hints button{
+    font-size: 4vw;
+  }
+}

@@ -5,7 +5,6 @@ import { fileURLToPath } from 'url';
 import bodyParser from "body-parser"
 import http from 'http';
 import { Server } from 'socket.io';
-import fs from 'fs';
 
 //***************************************DEFINING SERVER *************************************************/
 
@@ -38,9 +37,9 @@ let items = null
 let recipes = null
 let riddles = {}
 
-app.get("/items", (req, res) => {
+app.get("/items", async(req, res) => {
     if(items == null){
-        items = JSON.parse(fs.readFileSync("./items.json", 'utf8'))
+        items = await getData("https://craftdle-4ce47-default-rtdb.europe-west1.firebasedatabase.app/.json")
     }
     res.send(items)
 })
@@ -80,8 +79,17 @@ io.on('connection', async(socket) => {
     })
 });
 
-function convertRecipes(){
-    recipes = JSON.parse(fs.readFileSync("./recipes.json", 'utf8')).data;
+async function getData(url){
+    let return_data = {}
+    await fetch(url)
+    .then(response => response.json())
+    .then(data => return_data = data)
+    return return_data
+}
+
+async function convertRecipes(){
+    recipes = await getData("https://craftdle---recipes-f8dd6-default-rtdb.europe-west1.firebasedatabase.app/.json");
+    recipes = recipes.data
     recipes.forEach(recipe => {
         recipe = convertRiddle(recipe)
     });
@@ -89,7 +97,7 @@ function convertRecipes(){
 
 async function createRiddle(socket){
     if(recipes == null){
-        convertRecipes()
+        await convertRecipes()
     }
     let riddle
     do {
@@ -98,13 +106,13 @@ async function createRiddle(socket){
     riddles[socket.id] = {}
     riddles[socket.id]["riddle"] = riddle
     riddles[socket.id]["tips"] = 99
-    riddles[socket.id]["hints"] = generateHints(riddle)
+    riddles[socket.id]["hints"] = await generateHints(riddle)
     console.log(riddles[socket.id].riddle)
 }
 
-function generateHints(riddle){
+async function generateHints(riddle){
     let hints = {}
-    hints["hint1"] = `Stack size: ${getStackSize(riddle.item)}\nQuantity: ${riddle.quantity}`
+    hints["hint1"] = `Stack size: ${await getStackSize(riddle.item)}\nQuantity: ${riddle.quantity}`
     hints["hint2"] = `Number of different materials (min): ${findDifferentMaterials(riddle.recipe)}`
     hints["hint3"] = `Random material: ${randomizeMaterial(riddle.recipe)}`
     return hints
@@ -132,9 +140,9 @@ function randomizeMaterial(materials){
     return material
 }
 
-function getStackSize(item_name){
+async function getStackSize(item_name){
     if(items == null){
-        items = JSON.parse(fs.readFileSync("./items.json", 'utf8'))
+        items = await getData("https://craftdle-4ce47-default-rtdb.europe-west1.firebasedatabase.app/.json")
     }
     let stack_size = undefined
     items.data.forEach(item => {
@@ -147,6 +155,17 @@ function convertRiddle(riddle){
     let craft_matrix = [[],[],[]]
     let col = 0
     let row = 0
+    if(!Array.isArray(riddle.recipe)){
+        let recipe = []
+        for (let i = 0; i < 9; i++) {
+            if(riddle.recipe[i] == undefined){
+                recipe.push(null)
+            }else{
+                recipe.push(riddle.recipe[i])
+            }
+        }
+        riddle.recipe = recipe
+    }
     riddle.recipe.forEach(material => {
         craft_matrix[row].push(material)
         col++
@@ -155,26 +174,32 @@ function convertRiddle(riddle){
             row++
         }
     });
-    for (let i = 0; i < craft_matrix.length; i++) {
-        let is_all_null = true
-        craft_matrix[i].forEach(material => {
-            if(material != null) is_all_null &= false
-        });
-        if(is_all_null){
-            craft_matrix.splice(i, 1)
-            i--
-        }
-    }
-    for (let i = 0; i < craft_matrix[0].length; i++) {
-        let is_all_null = true
-        for (let j = 0; j < craft_matrix.length; j++) {
-            if(craft_matrix[j][i] != null) is_all_null &= false
-        }
-        if(is_all_null){
-            for (let j = 0; j < craft_matrix.length; j++) {
-                craft_matrix[j].splice(i, 1)
+    for (let a = 0; a < 2; a++) {
+        for (let i = 0; i < craft_matrix.length; i++) {
+            let is_all_null = true
+            if (i != 1 || craft_matrix.length < 3) {
+                craft_matrix[i].forEach(material => {
+                    if(material != null) is_all_null &= false
+                });
+                if(is_all_null){
+                    craft_matrix.splice(i, 1)
+                    i--
+                }
             }
-            i--
+        }
+        for (let i = 0; i < craft_matrix[0].length; i++) {
+            let is_all_null = true
+            if (i != 1 || craft_matrix[0].length < 3) {
+                for (let j = 0; j < craft_matrix.length; j++) {
+                    if(craft_matrix[j][i] != null) is_all_null &= false
+                }
+                if(is_all_null){
+                    for (let j = 0; j < craft_matrix.length; j++) {
+                        craft_matrix[j].splice(i, 1)
+                    }
+                    i--
+                }
+            }
         }
     }
     riddle.recipe = craft_matrix
