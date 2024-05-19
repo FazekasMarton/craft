@@ -276,7 +276,6 @@ function getBackendURL(){
 function scrollTop(){
   const tipsList: HTMLElement | null = document.getElementById('tipsList');
   if (tipsList) {
-    //tipsList.scrollTop = tipsList.scrollHeight*-1;
     tipsList.scrollTo({
       top: tipsList.scrollHeight*-1,
       behavior: "smooth"
@@ -328,6 +327,9 @@ function App() {
   socket.on("checkTip", data => {
     setResult(data);
     clearInputs()
+    setTimeout(() => {
+      scrollTop()
+    }, 1);
   });
 
   useEffect(() => {
@@ -349,7 +351,6 @@ function App() {
         <table>
           <tbody>
             {craftingTableSize.map((_, i) => {
-              scrollTop()
               return (<tr key={`row${i}`}>
                 {craftingTableSize.map((_, j) => {
                   let key = `slot${i * craftingTableSize.length + j}`
