@@ -34,7 +34,7 @@ interface tips {
 }
 
 function drop(e: React.DragEvent | React.MouseEvent, dropItem: HTMLElement | undefined, setDropItem: (element: HTMLElement) => void, recipes: recipe[], items: item[], drop: boolean) {
-  if (e.currentTarget.childNodes.length == 0) {
+  if (e.currentTarget.childNodes.length == 0 && dropItem != undefined) {
     e.preventDefault()
     let newElement = dropItem as HTMLElement
     if (e.buttons == 2 || e.buttons == 3 || drop) {
@@ -238,11 +238,11 @@ function findImage(name : string, items : item[]){
 }
   
 function selectItem(e: React.MouseEvent, setDropItem: (element: HTMLElement | undefined) => void){
-  setDropItem(e.currentTarget as HTMLElement)
   const targetElement = e.currentTarget;
   const parentElement = targetElement.parentElement;
-
+  
   if (parentElement && window.innerWidth < 920) {
+    setDropItem(e.currentTarget as HTMLElement)
     const previouslySelected = document.getElementById("selected");
     if (previouslySelected) {
       previouslySelected.removeAttribute("id");
@@ -277,6 +277,10 @@ function App() {
   const craftingTableSize = new Array(3).fill(null)
   const [result, setResult] = useState<tips>();
 
+  window.addEventListener("resize", () => {
+    setDropItem(undefined)
+  })
+
   socket.on("hints", data => {
     setHints(data);
   });
@@ -308,7 +312,7 @@ function App() {
               return (<tr key={`row${i}`}>
                 {craftingTableSize.map((value, j) => {
                   let key = `slot${i * craftingTableSize.length + j}`
-                  return (<td key={key} className='cragtingTableSlot' id={key} onDragOver={(e) => { drop(e, dropItem, setDropItem, recipes, items, false) }} onDrop={(e) => { drop(e, dropItem, setDropItem, recipes, items, true) }} onClick={(e) => {drop(e, dropItem, setDropItem, recipes, items, true)}}></td>)
+                  return (<td key={key} className='cragtingTableSlot' id={key} onDragOver={(e) => { drop(e, dropItem, setDropItem, recipes, items, false) }} onDrop={(e) => { drop(e, dropItem, setDropItem, recipes, items, true) }} onClick={(e) => {if(window.innerWidth < 920) drop(e, dropItem, setDropItem, recipes, items, true)}}></td>)
                 })}
               </tr>)
             })}
