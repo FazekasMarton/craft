@@ -1,4 +1,4 @@
-import React, { useState, useEffect, ReactNode, ReactElement, AriaAttributes } from 'react'
+import React, { useState, useEffect } from 'react'
 import craftingTableArrow from './assets/craftingtablearrow.png'
 import searchicon from './assets/searchicon.png'
 import io from 'socket.io-client';
@@ -312,9 +312,9 @@ function App() {
         <div id='craftingTitle'>Crafting</div>
         <table>
           <tbody>
-            {craftingTableSize.map((value, i) => {
+            {craftingTableSize.map((_, i) => {
               return (<tr key={`row${i}`}>
-                {craftingTableSize.map((value, j) => {
+                {craftingTableSize.map((_, j) => {
                   let key = `slot${i * craftingTableSize.length + j}`
                   return (<td key={key} className='cragtingTableSlot' id={key} onDragOver={(e) => { drop(e, dropItem, setDropItem, recipes, items, false) }} onDrop={(e) => { drop(e, dropItem, setDropItem, recipes, items, true) }} onClick={(e) => {if(window.innerWidth < 920) drop(e, dropItem, setDropItem, recipes, items, true)}}></td>)
                 })}
@@ -342,10 +342,10 @@ function App() {
                 <div id={`craftingTable${index}`} key={`craftingTable${index}`} className='tipCrafting'>
                   <table>
                     <tbody>
-                      {craftingTableSize.map((value, i) => {
+                      {craftingTableSize.map((_, i) => {
                         return (
                           <tr key={`row${index}_${i}`}>
-                            {craftingTableSize.map((value, j) => {
+                            {craftingTableSize.map((_, j) => {
                               let key = `slot${index}_${i * craftingTableSize.length + j}`
                               return (
                                 <td key={key} className={`craftingTableSlot ${item[i * craftingTableSize.length + j][Object.keys(item[i * craftingTableSize.length + j])[0]]}`}>
@@ -368,7 +368,7 @@ function App() {
           </div>
         </div>
       </div>
-      <div id='items' onDragOver={(e) => { e.preventDefault() }} onDrop={(e) => { if ((dropItem?.parentNode as HTMLElement)?.className != "itemSlot") dropItem?.remove(); craft(recipes, items) }}>
+      <div id='items' onDragOver={(e) => { e.preventDefault() }} onDrop={() => { if ((dropItem?.parentNode as HTMLElement)?.className != "itemSlot") dropItem?.remove(); craft(recipes, items) }}>
         <div id='itemBar'>
           <div id='inventoryTitle'>Inventory</div>
           <div id='itemSearch'>
