@@ -267,7 +267,7 @@ function clearInputs(){
 function getBackendURL(){
   let url = "http://localhost:6969"
   if(window.location.hostname != "localhost"){
-    url = "https://guideianangel.herokuapp.com/"
+    url = "https://guideianangel.herokuapp.com"
   }
   return url
 }
