@@ -3,7 +3,9 @@ import craftingTableArrow from './assets/craftingtablearrow.png'
 import searchicon from './assets/searchicon.png'
 import io from 'socket.io-client';
 
-const socket = io('http://localhost:6969');
+const url:string = getBackendURL()
+
+const socket = io(url)
 
 interface item {
   name: string,
@@ -262,6 +264,14 @@ function clearInputs(){
   item?.childNodes[0]?.remove()
 }
 
+function getBackendURL(){
+  let url = "http://localhost:6969"
+  if(window.location.hostname != "localhost"){
+    url = "https://guideianangel.herokuapp.com/"
+  }
+  return url
+}
+
 function App() {
   const [items, setItems] = useState<item[]>([]);
   const [recipes, setRecipes] = useState<recipe[]>([]);
@@ -295,13 +305,13 @@ function App() {
   });
 
   useEffect(() => {
-    fetch("http://localhost:6969/items")
+    fetch(`${url}/items`)
       .then(response => response.json())
       .then(data => setItems(data.data))
   }, []);
 
   useEffect(() => {
-    fetch("http://localhost:6969/recipes")
+    fetch(`${url}/recipes`)
       .then(response => response.json())
       .then(data => setRecipes(data.data))
   }, []);
