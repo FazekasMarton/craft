@@ -88,7 +88,6 @@ function findCraftingRecipe(craftingRecipe: Array<Array<string | null>>, origina
           craftedItem.draggable = false
           craftedItem.addEventListener("click", () => {chekcUserTip(i.name, craftingRecipe, originalRecipe)})
           item?.appendChild(craftedItem)
-          getHints()
         }
       });
     }
@@ -210,10 +209,6 @@ function convertRecipe(recipe: Array<string | null>) {
     }
   }
   return craftMatrix
-}
-
-function getHints() {
-  socket.emit("getHints")
 }
 
 function getHintContent(numberOfTips: number, hint: number | string | null, hintNumber: number, usedHint: boolean[], setUsedHint: (value: boolean[]) => void) {
