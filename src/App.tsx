@@ -34,7 +34,7 @@ interface tips {
 }
 
 function drop(e: React.DragEvent | React.MouseEvent, dropItem: HTMLElement | undefined, setDropItem: (element: HTMLElement) => void, recipes: recipe[], items: item[], drop: boolean) {
-  if (e.currentTarget.childNodes.length == 0) {
+  if (e.currentTarget.childNodes.length == 0 && dropItem != undefined) {
     e.preventDefault()
     let newElement = dropItem as HTMLElement
     if (e.buttons == 2 || e.buttons == 3 || drop) {
@@ -88,7 +88,6 @@ function findCraftingRecipe(craftingRecipe: Array<Array<string | null>>, origina
           craftedItem.draggable = false
           craftedItem.addEventListener("click", () => {chekcUserTip(i.name, craftingRecipe, originalRecipe)})
           item?.appendChild(craftedItem)
-          getHints()
         }
       });
     }
@@ -212,10 +211,6 @@ function convertRecipe(recipe: Array<string | null>) {
   return craftMatrix
 }
 
-function getHints() {
-  socket.emit("getHints")
-}
-
 function getHintContent(numberOfTips: number, hint: number | string | null, hintNumber: number, usedHint: boolean[], setUsedHint: (value: boolean[]) => void) {
   let content = <></>
   if (hint == null) {
@@ -243,17 +238,28 @@ function findImage(name : string, items : item[]){
 }
   
 function selectItem(e: React.MouseEvent, setDropItem: (element: HTMLElement | undefined) => void){
-  setDropItem(e.currentTarget as HTMLElement)
   const targetElement = e.currentTarget;
   const parentElement = targetElement.parentElement;
-
+  
   if (parentElement && window.innerWidth < 920) {
+    setDropItem(e.currentTarget as HTMLElement)
     const previouslySelected = document.getElementById("selected");
     if (previouslySelected) {
       previouslySelected.removeAttribute("id");
     }
     parentElement.id = "selected";
   }
+}
+
+function clearInputs(){
+  for (let i = 0; i < 9; i++) {
+    const element = document.getElementById(`slot${i}`);
+    if (element) {
+      element.innerHTML = "";
+    }
+  }
+  let item = document.getElementById("item")
+  item?.childNodes[0]?.remove()
 }
 
 function App() {
@@ -271,12 +277,21 @@ function App() {
   const craftingTableSize = new Array(3).fill(null)
   const [result, setResult] = useState<tips>();
 
+  window.addEventListener("resize", () => {
+    setDropItem(undefined)
+    let selectedElement = document.getElementById("selected")
+    if(selectedElement != undefined){
+      selectedElement.removeAttribute("id")
+    }
+  })
+
   socket.on("hints", data => {
     setHints(data);
   });
 
   socket.on("checkTip", data => {
     setResult(data);
+    clearInputs()
   });
 
   useEffect(() => {
@@ -301,7 +316,7 @@ function App() {
               return (<tr key={`row${i}`}>
                 {craftingTableSize.map((value, j) => {
                   let key = `slot${i * craftingTableSize.length + j}`
-                  return (<td key={key} className='cragtingTableSlot' id={key} onDragOver={(e) => { drop(e, dropItem, setDropItem, recipes, items, false) }} onDrop={(e) => { drop(e, dropItem, setDropItem, recipes, items, true) }} onClick={(e) => {drop(e, dropItem, setDropItem, recipes, items, true)}}></td>)
+                  return (<td key={key} className='cragtingTableSlot' id={key} onDragOver={(e) => { drop(e, dropItem, setDropItem, recipes, items, false) }} onDrop={(e) => { drop(e, dropItem, setDropItem, recipes, items, true) }} onClick={(e) => {if(window.innerWidth < 920) drop(e, dropItem, setDropItem, recipes, items, true)}}></td>)
                 })}
               </tr>)
             })}
