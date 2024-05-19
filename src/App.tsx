@@ -279,6 +279,10 @@ function App() {
 
   window.addEventListener("resize", () => {
     setDropItem(undefined)
+    let selectedElement = document.getElementById("selected")
+    if(selectedElement != undefined){
+      selectedElement.removeAttribute("id")
+    }
   })
 
   socket.on("hints", data => {
