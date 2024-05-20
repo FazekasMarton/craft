@@ -85,6 +85,8 @@ function App() {
 
   if(!socket.connected && items.length > 0 && recipes.length > 0 && error == null){
     setError(errorExample)
+  }else if(socket.connected && error != null){
+    location.reload()
   }
 
   socket.on("hints", data => {
