@@ -5,4 +5,4 @@ interface hints {
     hint3: string | null
 }
 
-export type {hints}
+export type { hints }

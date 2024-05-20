@@ -2,7 +2,7 @@ import { hints } from "./hints"
 import { tips } from "./tips"
 import { item } from "./item"
 
-interface tipsProps{
+interface tipsProps {
     hints: hints,
     result: tips | undefined,
     craftingTableSize: any[],
@@ -11,4 +11,4 @@ interface tipsProps{
     setUsedHints: (value: boolean[]) => void,
 }
 
-export type {tipsProps}
+export type { tipsProps }

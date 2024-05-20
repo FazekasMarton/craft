@@ -4,4 +4,4 @@ interface tips {
     solved: boolean
 }
 
-export type {tips}
+export type { tips }

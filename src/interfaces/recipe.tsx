@@ -5,4 +5,4 @@ interface recipe {
     shapeless: boolean
 }
 
-export type {recipe}
+export type { recipe }

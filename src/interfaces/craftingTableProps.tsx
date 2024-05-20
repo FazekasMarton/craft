@@ -11,7 +11,7 @@ interface craftingTableProps {
     items: item[];
     result: tips | undefined;
     pc: boolean;
-    socket: Socket
+    socket: Socket | undefined
 }
 
-export type {craftingTableProps}
+export type { craftingTableProps }

@@ -217,7 +217,7 @@ img{
   font-size: 2vmin;
 }
 
-#hints button:hover, #achievementButton:hover{
+#hints button:hover, #achievementButton:hover, #error button:hover{
   background-color: rgb(53, 113, 36);
   border-top: 1vmin solid rgb(93, 144, 74);
   border-right: 1vmin solid rgb(25, 56, 17);
@@ -313,13 +313,13 @@ table .correct{
   color: rgb(229,165,238)
 }
 
-#achievementButton{
+#achievementButton, #errorButton{
   grid-area: abutton;
   background-color: rgb(59,132,39);
-  border-top: 4px solid rgb(101,157,80);
-  border-right: 4px solid rgb(28,63,19);
-  border-bottom: 4px solid rgb(22,79,14);
-  border-left: 4px solid rgb(66,115,52);
+  border-top: 1vmin solid rgb(101,157,80);
+  border-right: 1vmin solid rgb(28,63,19);
+  border-bottom: 1vmin solid rgb(22,79,14);
+  border-left: 1vmin solid rgb(66,115,52);
   color: white;
   width: fit-content;
   justify-self: end;
@@ -336,6 +336,50 @@ table .correct{
   border-right: 2px solid rgb(28,63,19);
   border-bottom: 2px solid rgb(22,79,14);
   border-left: 2px solid rgb(66,115,52);
+}
+
+#error{
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-image: url("./assets/error-bg.jpg");
+  background-position: center;
+  background-size: cover;
+  max-width: 700px;
+  width: 70%;
+  height: 50%;
+  border: 3px solid rgb(51,50,50);
+}
+
+#errorContent{
+  display: flex;
+  flex-direction: column;
+  padding: 0px;
+  width: 50%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.452);
+}
+
+#errorCode{
+  margin-left: 20px;
+  color: rgb(255, 170, 0);
+}
+
+#errorTitle{
+  margin-left: 20px;
+  color: rgb(176, 46, 38);
+}
+
+#errorText{
+  margin: 0 20px;
+}
+
+#errorButton{
+  justify-self: center;
+  align-self: center;
+  width: 50%;
+  margin: auto;
 }
 
 @media only screen and (max-width: 821px) { 
@@ -420,5 +464,9 @@ table .correct{
     max-width: 90%;
     width: max-content;
     padding-bottom: 10px;
+  }
+
+  #errorContent{
+    width: 100%;
   }
 }
