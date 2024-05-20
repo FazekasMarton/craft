@@ -1,42 +1,17 @@
 import React, { useState, useEffect } from 'react'
-import craftingTableArrow from './assets/craftingtablearrow.png'
 import searchicon from './assets/searchicon.png'
 import { item } from './interfaces/item.tsx';
 import { recipe } from './interfaces/recipe.tsx';
 import { hints } from './interfaces/hints.tsx';
 import { tips } from './interfaces/tips.tsx';
 import { CraftingTable } from './components/CraftingTable.tsx';
+import { Tips } from './components/Tips.tsx';
 import { craft } from './functions/craft.tsx';
+import { findImage } from './functions/findImage.tsx';
 import io from 'socket.io-client';
 
 const url:string = getBackendURL()
 const socket = io(url)
-
-function getHintContent(numberOfTips: number, hint: number | string | null, hintNumber: number, usedHint: boolean[], setUsedHint: (value: boolean[]) => void) {
-  let content = <></>
-  if (hint == null) {
-    content = <button>Hint after {hintNumber * 5 - numberOfTips} turn!</button>
-  } else if (usedHint[hintNumber]) {
-    content = <div className='hint'>{hint}</div>
-  } else {
-    content = <button onClick={() => {
-      const updatedUsedHint = [...usedHint];
-      updatedUsedHint[hintNumber] = true;
-      setUsedHint(updatedUsedHint);
-    }}>Reveal hint</button>
-  }
-  return content
-}
-
-function findImage(name : string, items : item[]){
-  let image : string = "";
-  items.forEach(item => {
-    if(item.name == name){
-      image = item.image;
-    }
-  })
-  return image;
-}
   
 function selectItem(e: React.MouseEvent, setDropItem: (element: HTMLElement | undefined) => void, pc: boolean){
   const targetElement = e.currentTarget;
@@ -153,50 +128,8 @@ function App() {
 
   return (
     <>
-      <CraftingTable craftingTableSize={craftingTableSize} dropItem={dropItem} setDropItem={setDropItem} recipes={recipes} items={items} result={result} pc={pc} socket={socket}></CraftingTable>
-      <div id='tips'>
-        <div id='hintContainer'>
-          <div id='hintsTitle'>Hints:</div>
-          <div id='hints'>
-            <div>{getHintContent(hints.tips, hints.hint1, 1, usedHints, setUsedHints)}</div>
-            <div>{getHintContent(hints.tips, hints.hint2, 2, usedHints, setUsedHints)}</div>
-            <div>{getHintContent(hints.tips, hints.hint3, 3, usedHints, setUsedHints)}</div>
-          </div>
-        </div>
-        <div id='tipsContainer'>
-          <div id='tipsTitle'>Tips:</div>
-            <div id='tipsList'>
-            {result?.tippedRecipes.map((item, index) => {
-              return (
-                <div id={`craftingTable${index}`} key={`craftingTable${index}`} className='tipCrafting'>
-                  <table>
-                    <tbody>
-                      {craftingTableSize.map((_, i) => {
-                        return (
-                          <tr key={`row${index}_${i}`}>
-                            {craftingTableSize.map((_, j) => {
-                              let key = `slot${index}_${i * craftingTableSize.length + j}`
-                              return (
-                                <td key={key} className={`craftingTableSlot ${item[i * craftingTableSize.length + j][Object.keys(item[i * craftingTableSize.length + j])[0]]}`}>
-                                  <img src={findImage(String(Object.keys(item[i * craftingTableSize.length + j])[0]), items)}></img>
-                                </td>
-                              )
-                            })}
-                          </tr>
-                        )
-                      })}
-                    </tbody>
-                  </table>
-                  <img id={`craftingArrow${index}`} src={craftingTableArrow} alt="arrow" className='craftingArrow'/>
-                  <div id={`item${index}`} className='tippedItem'>
-                    <img src={findImage(result?.tippedItems[index],items)}></img>
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        </div>
-      </div>
+      <CraftingTable craftingTableSize={craftingTableSize} dropItem={dropItem} setDropItem={setDropItem} recipes={recipes} items={items} result={result} pc={pc} socket={socket}/>
+      <Tips hints={hints} craftingTableSize={craftingTableSize} result={result} items={items} usedHints={usedHints} setUsedHints={setUsedHints}/>
       <div id='items' onDragOver={(e) => { e.preventDefault() }} onDrop={() => { if ((dropItem?.parentNode as HTMLElement)?.className != "itemSlot") dropItem?.remove(); craft(recipes, items, socket) }}>
         <div id='itemBar'>
           <div id='inventoryTitle'>Inventory</div>
