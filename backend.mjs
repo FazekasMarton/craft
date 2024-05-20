@@ -64,8 +64,9 @@ io.on('connection', async(socket) => {
             }else{
                 result = createPossibleCombinations(riddles[socket.id].riddle, data);
             }
-            riddles[socket.id]["tippedRecipes"].push(result);
-            socket.emit("checkTip", {tippedRecipes: riddles[socket.id]["tippedRecipes"], tippedItems: riddles[socket.id]["tippedItems"]});
+            riddles[socket.id]["tippedRecipes"].push(result.matches);
+            console.log(result.solved)
+            socket.emit("checkTip", {tippedRecipes: riddles[socket.id]["tippedRecipes"], tippedItems: riddles[socket.id]["tippedItems"], solved: result.solved});
         };
     });
     socket.on("getHints", () => {
@@ -101,7 +102,9 @@ function createPossibleCombinations(riddle, data){
 }
 
 function markMatches(result, tip, riddle){
-    let materials = gatherCorrectItems(riddle);
+    let data = gatherCorrectItems(riddle.recipe)
+    let materials = data.items;
+    let solved = result.matches == data.essentialItems.length && result.matches == gatherCorrectItems(tip).essentialItems.length;
     let matches = [];
     for (let i = 0; i < result.matchingMatrix.length; i++) {
         for (let j = 0; j < result.matchingMatrix[i].length; j++) {
@@ -111,7 +114,6 @@ function markMatches(result, tip, riddle){
                 if ((Array.isArray(result.matchingMatrix[i][j]) && result.matchingMatrix[i][j].includes(key)) || result.matchingMatrix[i][j] == key) {
                     obj[key] = "correct";
                     materials.pop(key)
-                    console.log(materials)
                 } else {
                     obj[key] = "waiting";
                 }
@@ -131,7 +133,7 @@ function markMatches(result, tip, riddle){
             }
         }
     });
-    return matches;
+    return {matches: matches, solved: solved};
 };
 
 function compareMatrices(matrices, tip){
@@ -190,8 +192,10 @@ function fillMatrix(matrix, startRow, startCol) {
 
 function checkShapelessRecipe(riddle, data){
     let result = [];
-    let correctMaterials = gatherCorrectItems(riddle)
-    console.log("original", data.originalRecipe)
+    let matches = 0;
+    let mats = gatherCorrectItems(riddle.recipe);
+    let wrongMat = false;
+    let correctMaterials = mats.items
     data.originalRecipe.forEach(item => {
         let obj = {};
             let key = item;
@@ -199,30 +203,38 @@ function checkShapelessRecipe(riddle, data){
                 obj[key] = null
             } else if(correctMaterials.includes(item)){
                 obj[key] = "correct";
+                matches++;
             } else{
                 obj[key] = "wrong";
+                wrongMat = true;
             }
             result.push(obj);
     });
-    return result;
+    let solved = matches == mats.essentialItems.length && !wrongMat;
+    return {matches: result, solved: solved};
 }
 
-function gatherCorrectItems(riddle){
+function gatherCorrectItems(recipe){
     let items = [];
-    riddle.recipe.forEach(row => {
+    let essentialItems = []
+    recipe.forEach(row => {
         row.forEach(cell => {
             if(Array.isArray(cell)){
+                if(!cell.includes(null)){
+                    essentialItems.push(cell[0]);
+                }
                 cell.forEach(item => {
                     if(item != null){
                         items.push(item);
                     };
                 });
-            }else{
+            }else if(cell != null){
                 items.push(cell);
+                essentialItems.push(cell);
             };
         });
     });
-    return items;
+    return {items: items, essentialItems: essentialItems};
 };
 
 async function getData(url){
