@@ -104,7 +104,7 @@ img{
   display: grid;
   grid-template-rows: min-content auto;
   width: 100%;
-  height: 98vmin;
+  height: 98vh;
   padding-bottom: 2vmin;
 }
 
@@ -337,6 +337,21 @@ table .correct{
   border-bottom: 2px solid rgb(22,79,14);
   border-left: 2px solid rgb(66,115,52);
 }
+
+@media only screen and (max-width: 821px) { 
+  #itemBar{
+    flex-direction: column;
+    padding: 0;
+  }
+
+  #itemSearch{
+    width: 60%;
+  }
+
+  #search{
+    width: 100%;
+  }
+}
   
 @media (pointer:none) and (orientation: portrait), (pointer:coarse) and (orientation: portrait){
   #wrapper{
@@ -351,11 +366,6 @@ table .correct{
 
   #items{
     height: 30vh;
-  }
-
-  #itemBar{
-    flex-direction: column;
-    padding: 0;
   }
 
   #inventory{
