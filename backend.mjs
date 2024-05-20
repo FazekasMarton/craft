@@ -113,7 +113,7 @@ function markMatches(result, tip, riddle){
                 let key = tip[i][j];
                 if ((Array.isArray(result.matchingMatrix[i][j]) && result.matchingMatrix[i][j].includes(key)) || result.matchingMatrix[i][j] == key) {
                     obj[key] = "correct";
-                    materials.pop(key)
+                    materials = removeFromMaterials(materials, key);
                 } else {
                     obj[key] = "waiting";
                 }
@@ -128,6 +128,7 @@ function markMatches(result, tip, riddle){
         if (match[key] == "waiting") { 
             if (materials.includes(key)) { 
                 match[key] = "semi-correct";
+                materials = removeFromMaterials(materials, key);
             } else {
                 match[key] = "wrong";
             }
@@ -188,6 +189,22 @@ function fillMatrix(matrix, startRow, startCol) {
         }
     }
     return filledMatrix;
+}
+
+function removeFromMaterials(data, item){
+    let array = data;
+    for(let i = 0; i < array.length; i++) {
+        if(Array.isArray(data[i])){
+            if(data[i].includes(item)){
+                array.splice(i,1);
+                break;
+            }
+        }else if(data[i] == item){
+            array.splice(i,1);
+            break;
+        }
+    }
+    return array;
 }
 
 function checkShapelessRecipe(riddle, data){
