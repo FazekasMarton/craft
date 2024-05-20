@@ -173,9 +173,9 @@ function generateMatrices(inputMatrix) {
     let maxRows = 3 - inputMatrix.length + 1;
     let maxCols = 3 - Math.max(...inputMatrix.map(row => row.length)) + 1;
     for (let i = 0; i < maxRows; i++) {
-      for (let j = 0; j < maxCols; j++) {
-        results.push(fillMatrix(inputMatrix, i, j));
-      }
+        for (let j = 0; j < maxCols; j++) {
+            results.push(fillMatrix(inputMatrix, i, j));
+        }
     }
     return results;
 }
@@ -183,9 +183,9 @@ function generateMatrices(inputMatrix) {
 function fillMatrix(matrix, startRow, startCol) {
     let filledMatrix = Array(3).fill(null).map(() => Array(3).fill(null));
     for (let i = 0; i < matrix.length; i++) {
-      for (let j = 0; j < matrix[i].length; j++) {
+        for (let j = 0; j < matrix[i].length; j++) {
         filledMatrix[startRow + i][startCol + j] = matrix[i][j] || null;
-      }
+        }
     }
     return filledMatrix;
 }
