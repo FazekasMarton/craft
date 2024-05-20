@@ -7,8 +7,8 @@ import { error } from './interfaces/error.tsx';
 import { CraftingTable } from './components/CraftingTable.tsx';
 import { Tips } from './components/Tips.tsx';
 import { Items } from './components/Items.tsx';
+import { Achievement } from './components/Achievement.tsx';
 import { Error } from './components/Error.tsx';
-import { findImage } from './functions/findImage.tsx';
 import io from 'socket.io-client';
 
 const url: string = getBackendURL()
@@ -41,20 +41,6 @@ function scrollTop() {
       behavior: "smooth"
     })
   }
-}
-
-function getAchievement(result: tips | undefined, items: item[]) {
-  let achievement = <></>
-  if (result?.solved) {
-    let item = result.tippedItems[result.tippedItems.length - 1]
-    achievement = <div id='achievement'>
-      <img id='achievementImage' src={findImage(item, items)} alt="solvedRidle" />
-      <div id='achievementTitle'>Challenge Complete!</div>
-      <button id='achievementButton' onClick={() => { location.reload() }}>New Game</button>
-      <div id='achievementText'>Solve The Riddle: {item}</div>
-    </div>
-  }
-  return (achievement)
 }
 
 function checkPC(setPC: (value: boolean) => void) {
@@ -143,7 +129,7 @@ function App() {
       <CraftingTable craftingTableSize={craftingTableSize} dropItem={dropItem} setDropItem={setDropItem} recipes={recipes} items={items} result={result} pc={pc} socket={socket} />
       <Tips hints={hints} craftingTableSize={craftingTableSize} result={result} items={items} usedHints={usedHints} setUsedHints={setUsedHints} />
       <Items dropItem={dropItem} recipes={recipes} items={items} setSearch={setSearch} search={search} setDropItem={setDropItem} pc={pc} socket={socket} />
-      {getAchievement(result, items)}
+      <Achievement result={result} items={items}/>
       <Error error={error} />
     </>
   )
