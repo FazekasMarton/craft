@@ -42,7 +42,7 @@ img{
   grid-area: craftingTable;
   display: grid;
   align-items: center;
-  grid-template-columns: auto auto auto;
+  grid-template-columns: -webkit-max-content;
   grid-template-areas: 
   "title . ."
   "craft arrow item";
@@ -90,7 +90,6 @@ img{
 #craftingArrow{
   grid-area: arrow;
   height: 8vmin;
-  display: flex;
 }
 
 #item, .tippedItem{
