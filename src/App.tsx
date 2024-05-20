@@ -1,31 +1,16 @@
-import React, { useState, useEffect } from 'react'
-import searchicon from './assets/searchicon.png'
+import { useState, useEffect } from 'react'
 import { item } from './interfaces/item.tsx';
 import { recipe } from './interfaces/recipe.tsx';
 import { hints } from './interfaces/hints.tsx';
 import { tips } from './interfaces/tips.tsx';
 import { CraftingTable } from './components/CraftingTable.tsx';
 import { Tips } from './components/Tips.tsx';
-import { craft } from './functions/craft.tsx';
+import { Items } from './components/Items.tsx';
 import { findImage } from './functions/findImage.tsx';
 import io from 'socket.io-client';
 
 const url:string = getBackendURL()
 const socket = io(url)
-  
-function selectItem(e: React.MouseEvent, setDropItem: (element: HTMLElement | undefined) => void, pc: boolean){
-  const targetElement = e.currentTarget;
-  const parentElement = targetElement.parentElement;
-  
-  if (parentElement && !pc) {
-    setDropItem(e.currentTarget as HTMLElement)
-    const previouslySelected = document.getElementById("selected");
-    if (previouslySelected) {
-      previouslySelected.removeAttribute("id");
-    }
-    parentElement.id = "selected";
-  }
-}
 
 function clearInputs(){
   for (let i = 0; i < 9; i++) {
@@ -130,28 +115,7 @@ function App() {
     <>
       <CraftingTable craftingTableSize={craftingTableSize} dropItem={dropItem} setDropItem={setDropItem} recipes={recipes} items={items} result={result} pc={pc} socket={socket}/>
       <Tips hints={hints} craftingTableSize={craftingTableSize} result={result} items={items} usedHints={usedHints} setUsedHints={setUsedHints}/>
-      <div id='items' onDragOver={(e) => { e.preventDefault() }} onDrop={() => { if ((dropItem?.parentNode as HTMLElement)?.className != "itemSlot") dropItem?.remove(); craft(recipes, items, socket) }}>
-        <div id='itemBar'>
-          <div id='inventoryTitle'>Inventory</div>
-          <div id='itemSearch'>
-            <img id='searchIcon' src={searchicon} alt="search" />
-            <input id='search' type="text" placeholder='Search...' onInput={(e) => { setSearch(e.currentTarget.value) }} />
-          </div>
-        </div>
-        <div id='inventory'>
-          <div id='slots'>
-            {items.map((item: item, index) => {
-              let display: string = "none"
-              if (item.name.toLocaleLowerCase().includes(search.toLocaleLowerCase())) display = "flex"
-              return (
-                <div key={`itemSlot#${index}`} className='itemSlot' style={{ display: display }}>
-                  <img src={item.image} alt={item.name} title={item.name} draggable onDrag={(e) => { setDropItem(e.currentTarget) }} onClick={(e) => {selectItem(e, setDropItem, pc)}}/>
-                </div>
-              )
-            })}
-          </div>
-        </div>
-      </div>
+      <Items dropItem={dropItem} recipes={recipes} items={items} setSearch={setSearch} search={search} setDropItem={setDropItem} pc={pc} socket={socket}/>
       {getAchievement(result, items)}
     </>
   )
