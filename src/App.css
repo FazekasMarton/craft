@@ -90,6 +90,7 @@ img{
 #craftingArrow{
   grid-area: arrow;
   height: 8vmin;
+  display: flex;
 }
 
 #item, .tippedItem{
