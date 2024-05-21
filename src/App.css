@@ -342,6 +342,7 @@ table .correct {
   color: white;
   width: fit-content;
   justify-self: end;
+  font-family: MinecraftRegular;
 }
 
 #achievementText {

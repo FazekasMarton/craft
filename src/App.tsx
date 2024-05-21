@@ -51,6 +51,7 @@ function checkPC(setPC: (value: boolean) => void) {
 }
 
 function App() {
+  const [timeOut, setTimeOut] = useState<ReturnType<typeof setTimeout>>();
   const [error, setError] = useState<error | null>(null);
   const [count, setCount] = useState(0);
   const [pc, setPC] = useState(checkPC(() => { }));
@@ -84,9 +85,15 @@ function App() {
   })
 
   if(!socket.connected && items.length > 0 && recipes.length > 0 && error == null){
-    setError(errorExample)
+    setTimeOut(
+      setTimeout(() => {
+        setError(errorExample)
+      }, 5000)
+    )
   }else if(socket.connected && error != null){
     location.reload()
+  }else{
+    clearTimeout(timeOut)
   }
 
   socket.on("hints", data => {
