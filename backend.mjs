@@ -28,7 +28,7 @@ app.use(express.static('public'));
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-        origin: "http://localhost:5173",
+        origin: ["http://localhost:5173", "https://craftdle.vercel.app"],
         methods: ["GET", "POST"]
     }
 });
@@ -67,32 +67,34 @@ io.on('connection', async(socket) => {
             riddles[socket.id]["tippedRecipes"].push(result.matches);
             console.log(result.solved)
             socket.emit("checkTip", {tippedRecipes: riddles[socket.id]["tippedRecipes"], tippedItems: riddles[socket.id]["tippedItems"], solved: result.solved});
+            getHints(socket)
         };
     });
-    socket.on("getHints", () => {
-        let hints = {
-            tips: riddles[socket.id].tips,
-            hint1: null,
-            hint2: null,
-            hint3: null
-        }
-        let hints_template = riddles[socket.id].hints
-        if(hints.tips >= 5){
-            hints.hint1 = hints_template.hint1
-            if(hints.tips >= 10){
-                hints.hint2 = hints_template.hint2
-                if(hints.tips >= 15){
-                    hints.hint3 = hints_template.hint3
-                }
-            }
-        }
-        socket.emit("hints", hints)
-    })
 
     socket.on("disconnect", () => {
         delete riddles[socket.id]
     })
 });
+
+function getHints(socket){
+    let hints = {
+        tips: riddles[socket.id].tips,
+        hint1: null,
+        hint2: null,
+        hint3: null
+    }
+    let hints_template = riddles[socket.id].hints
+    if(hints.tips >= 5){
+        hints.hint1 = hints_template.hint1
+        if(hints.tips >= 10){
+            hints.hint2 = hints_template.hint2
+            if(hints.tips >= 15){
+                hints.hint3 = hints_template.hint3
+            }
+        }
+    }
+    socket.emit("hints", hints)
+}
 
 function createPossibleCombinations(riddle, data){
     let matrices = generateMatrices(riddle.recipe);
