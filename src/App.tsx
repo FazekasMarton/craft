@@ -51,7 +51,7 @@ function checkPC(setPC: (value: boolean) => void) {
 }
 
 function App() {
-  const [timeOut, setTimeOut] = useState<ReturnType<typeof setTimeout>>();
+  const [timeOut, setTimeOut] = useState<null | ReturnType<typeof setTimeout>>(null);
   const [error, setError] = useState<error | null>(null);
   const [count, setCount] = useState(0);
   const [pc, setPC] = useState(checkPC(() => { }));
@@ -84,16 +84,16 @@ function App() {
     checkPC(setPC)
   })
 
-  if(!socket.connected && items.length > 0 && recipes.length > 0 && error == null){
+  if (!socket.connected && items.length > 0 && recipes.length > 0 && error == null && timeOut == null) {
     setTimeOut(
       setTimeout(() => {
         setError(errorExample)
       }, 5000)
     )
-  }else if(socket.connected && error != null){
+  } else if (socket.connected && error != null) {
     location.reload()
-  }else{
-    clearTimeout(timeOut)
+  } else {
+    if (timeOut != null) clearTimeout(timeOut)
   }
 
   socket.on("hints", data => {
@@ -132,13 +132,12 @@ function App() {
     }
   }, [count]);
 
-
   return (
     <>
       <CraftingTable craftingTableSize={craftingTableSize} dropItem={dropItem} setDropItem={setDropItem} recipes={recipes} items={items} result={result} pc={pc} socket={socket} />
       <Tips hints={hints} craftingTableSize={craftingTableSize} result={result} items={items} usedHints={usedHints} setUsedHints={setUsedHints} />
       <Items dropItem={dropItem} recipes={recipes} items={items} setSearch={setSearch} search={search} setDropItem={setDropItem} pc={pc} socket={socket} />
-      <Achievement result={result} items={items}/>
+      <Achievement result={result} items={items} />
       <Error error={error} />
     </>
   )
