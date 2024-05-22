@@ -10,19 +10,26 @@ import { Items } from './components/Items.tsx';
 import { Achievement } from './components/Achievement.tsx';
 import { Error } from './components/Error.tsx';
 import io from 'socket.io-client';
+import dropSound from "./assets/audio/drop.mp3"
+
+const dropAudio = new Audio(dropSound)
+dropAudio.preload = "auto"
 
 const url: string = getBackendURL()
 const socket = io(url)
 
 function clearInputs() {
-  for (let i = 0; i < 9; i++) {
-    const element = document.getElementById(`slot${i}`);
-    if (element) {
-      element.innerHTML = "";
+  dropAudio.play()
+  setTimeout(() => {
+    for (let i = 0; i < 9; i++) {
+      const element = document.getElementById(`slot${i}`);
+      if (element) {
+        element.innerHTML = "";
+      }
     }
-  }
-  let item = document.getElementById("item")
-  item?.childNodes[0]?.remove()
+    let item = document.getElementById("item")
+    item?.childNodes[0]?.remove()
+  }, dropAudio.duration * 1000);
 }
 
 function getBackendURL() {

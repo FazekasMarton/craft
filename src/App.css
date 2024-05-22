@@ -364,7 +364,7 @@ table .correct {
   left: 50%;
   transform: translate(-50%, -50%);
   background-color: rgb(51, 50, 50);
-  background-image: url("./assets/error-bg.jpg");
+  background-image: url("./assets/image/error-bg.jpg");
   background-position: center;
   background-size: cover;
   max-width: 700px;

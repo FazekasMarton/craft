@@ -1,4 +1,4 @@
-import craftingTableArrow from '../assets/craftingtablearrow.png'
+import craftingTableArrow from '../assets/image/craftingtablearrow.png'
 import { tipsProps } from "../interfaces/tipsProps"
 import { getHintContent } from '../functions/getHintContent'
 import { findImage } from '../functions/findImage'

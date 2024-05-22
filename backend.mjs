@@ -87,6 +87,8 @@ io.on('connection', async(socket) => {
         };
     });
 
+    console.log(riddles)
+
     socket.on("disconnect", () => {
         delete riddles[socket.id]
     })

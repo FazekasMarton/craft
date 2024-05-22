@@ -1,4 +1,4 @@
-import craftingTableArrow from '../assets/craftingtablearrow.png'
+import craftingTableArrow from '../assets/image/craftingtablearrow.png'
 import { craftingTableProps } from "../interfaces/craftingTableProps"
 import { drop } from "../functions/drop"
 

@@ -1,4 +1,4 @@
-import searchicon from '../assets/searchicon.png'
+import searchicon from '../assets/image/searchicon.png'
 import { itemsProps } from "../interfaces/itemsProps";
 import { item } from "../interfaces/item";
 import { craft } from "../functions/craft";
