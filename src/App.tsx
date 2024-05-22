@@ -20,16 +20,14 @@ const socket = io(url)
 
 function clearInputs() {
   dropAudio.play()
-  setTimeout(() => {
-    for (let i = 0; i < 9; i++) {
-      const element = document.getElementById(`slot${i}`);
-      if (element) {
-        element.innerHTML = "";
-      }
+  for (let i = 0; i < 9; i++) {
+    const element = document.getElementById(`slot${i}`);
+    if (element) {
+      element.innerHTML = "";
     }
-    let item = document.getElementById("item")
-    item?.childNodes[0]?.remove()
-  }, dropAudio.duration * 1000);
+  }
+  let item = document.getElementById("item")
+  item?.childNodes[0]?.remove()
 }
 
 function getBackendURL() {
