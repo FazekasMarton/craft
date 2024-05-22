@@ -45,7 +45,10 @@ img {
   grid-area: craftingTable;
   display: grid;
   align-items: center;
-  grid-template-columns: -webkit-max-content;
+  -webkit-grid-template-columns: max-content;
+  -moz-grid-template-columns: max-content;
+  -ms-grid-template-columns: max-content;
+  grid-template-columns: max-content;
   grid-template-areas:
     "title . ."
     "craft arrow item";

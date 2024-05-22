@@ -49,8 +49,8 @@ function scrollTop() {
 }
 
 function checkPC(setPC: (value: boolean) => void) {
-  const agent = navigator.userAgent.toLocaleLowerCase()
-  const pc = !/mobile|android|iphone|ipod|blackberry|windows phone|tablet|ipad|macintosh/i.test(agent)
+  const agent = navigator.userAgent
+  const pc = !(/mobile|android|iphone|ipod|blackberry|windows phone|tablet|ipad|macintosh/i.test(agent.toLocaleLowerCase()) || /TV/i.test(agent))
   setPC(pc)
   return pc
 }
