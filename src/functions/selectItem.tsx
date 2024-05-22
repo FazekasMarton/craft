@@ -15,7 +15,7 @@ function selectItem(e: React.MouseEvent, setDropItem: (element: HTMLElement | un
                 previouslySelected.removeAttribute("id");
             }
             parentElement.id = "selected";
-        }, clickAudio.duration * 1);
+        }, clickAudio.duration * 250);
     }
 }
 
