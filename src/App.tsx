@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, ReactNode } from 'react'
 import { item } from './interfaces/item.tsx';
 import { recipe } from './interfaces/recipe.tsx';
 import { hints } from './interfaces/hints.tsx';
@@ -11,6 +11,7 @@ import { Achievement } from './components/Achievement.tsx';
 import { Error } from './components/Error.tsx';
 import io from 'socket.io-client';
 import dropSound from "./assets/audio/drop.mp3"
+import { craft } from './functions/craft.tsx';
 
 const dropAudio = new Audio(dropSound)
 dropAudio.preload = "auto"
@@ -18,16 +19,13 @@ dropAudio.preload = "auto"
 const url: string = getBackendURL()
 const socket = io(url)
 
-function clearInputs() {
+function clearInputs(craftingTableSlots: Array<HTMLImageElement | null>, setCraftingTableSlots: (value: Array<HTMLImageElement | null>) => void) {
   dropAudio.play()
-  for (let i = 0; i < 9; i++) {
-    const element = document.getElementById(`slot${i}`);
-    if (element) {
-      element.innerHTML = "";
-    }
-  }
-  let item = document.getElementById("item")
-  item?.childNodes[0]?.remove()
+  let newSlots = [...craftingTableSlots]
+  newSlots.forEach((_, index) => {
+    newSlots[index] = null
+  });
+  setCraftingTableSlots(newSlots)
 }
 
 function getBackendURL() {
@@ -63,7 +61,10 @@ function App() {
   const [items, setItems] = useState<item[]>([]);
   const [recipes, setRecipes] = useState<recipe[]>([]);
   const [search, setSearch] = useState("");
-  const [dropItem, setDropItem] = useState<HTMLElement>();
+  const [dropItem, setDropItem] = useState<HTMLImageElement>();
+  const [craftingTableSlots, setCraftingTableSlots] = useState<Array<null | HTMLImageElement>>(new Array(9).fill(null));
+  const [craftedItem, setCraftedItem] = useState<ReactNode | null>(null);
+  const [craftedItemsRecipe, setCraftedItemsRecipe] = useState<Array<null | string>>(new Array(9).fill(null));
   const [hints, setHints] = useState<hints>({
     tips: 0,
     hint1: null,
@@ -107,10 +108,10 @@ function App() {
 
   socket.on("checkTip", data => {
     setResult(data);
-    clearInputs()
+    clearInputs(craftingTableSlots, setCraftingTableSlots)
     setTimeout(() => {
       scrollTop()
-    }, 1);
+    }, 0);
   });
 
   useEffect(() => {
@@ -137,11 +138,13 @@ function App() {
     }
   }, [count]);
 
+  craft(recipes, items, socket, craftingTableSlots, setCraftedItem, craftedItemsRecipe, setCraftedItemsRecipe)
+
   return (
     <>
-      <CraftingTable craftingTableSize={craftingTableSize} dropItem={dropItem} setDropItem={setDropItem} recipes={recipes} items={items} result={result} pc={pc} socket={socket} />
+      <CraftingTable craftingTableSize={craftingTableSize} dropItem={dropItem} setDropItem={setDropItem} result={result} pc={pc} slots={craftingTableSlots} setSlots={setCraftingTableSlots} craftedItem={craftedItem}/>
       <Tips hints={hints} craftingTableSize={craftingTableSize} result={result} items={items} usedHints={usedHints} setUsedHints={setUsedHints} />
-      <Items dropItem={dropItem} recipes={recipes} items={items} setSearch={setSearch} search={search} setDropItem={setDropItem} pc={pc} socket={socket} />
+      <Items dropItem={dropItem} recipes={recipes} items={items} setSearch={setSearch} search={search} setDropItem={setDropItem} pc={pc} socket={socket} slots={craftingTableSlots} setSlots={setCraftingTableSlots}/>
       <Achievement result={result} items={items} />
       <Error error={error} />
     </>

@@ -1,12 +1,18 @@
 import searchicon from '../assets/image/searchicon.png'
 import { itemsProps } from "../interfaces/itemsProps";
 import { item } from "../interfaces/item";
-import { craft } from "../functions/craft";
 import { selectItem } from '../functions/selectItem';
 
 function Items(props: itemsProps) {
     return (
-        <div id='items' onDragOver={(e) => { e.preventDefault() }} onDrop={() => { if ((props.dropItem?.parentNode as HTMLElement)?.className != "itemSlot") props.dropItem?.remove(); craft(props.recipes, props.items, props.socket) }}>
+        <div id='items' onDragOver={(e) => { e.preventDefault() }} onDrop={() => {
+            if ((props.dropItem?.parentNode as HTMLElement)?.className != "itemSlot") {
+                let newSlots = [...props.slots]
+                let dropParent = props.dropItem?.parentNode as HTMLElement
+                newSlots[Number(dropParent?.id.replace("slot", ""))] = null
+                props.setSlots(newSlots)
+            }
+        }}>
             <div id='itemBar'>
                 <div id='inventoryTitle'>Inventory</div>
                 <div id='itemSearch'>

@@ -1,6 +1,7 @@
 import craftingTableArrow from '../assets/image/craftingtablearrow.png'
 import { craftingTableProps } from "../interfaces/craftingTableProps"
 import { drop } from "../functions/drop"
+import { ReactNode } from 'react'
 
 function CraftingTable(props: craftingTableProps) {
   return (
@@ -12,14 +13,41 @@ function CraftingTable(props: craftingTableProps) {
             return (<tr key={`row${i}`}>
               {props.craftingTableSize.map((_, j) => {
                 let key = `slot${i * props.craftingTableSize.length + j}`
-                return (<td key={key} className='cragtingTableSlot' id={key} onDragOver={(e) => { drop(e, props.dropItem, props.setDropItem, props.recipes, props.items, false, props.result, props.pc, props.socket) }} onDrop={(e) => { drop(e, props.dropItem, props.setDropItem, props.recipes, props.items, true, props.result, props.pc, props.socket) }} onClick={(e) => { if (!props.pc) drop(e, props.dropItem, props.setDropItem, props.recipes, props.items, true, props.result, props.pc, props.socket) }}></td>)
+                let item = props.slots[i * props.craftingTableSize.length + j]
+                let img: null | ReactNode = <img
+                  src={item?.src}
+                  alt={item?.alt}
+                  title={item?.title}
+                  draggable
+                  onContextMenu={(e) => {
+                    let newSlots = [...props.slots]
+                    newSlots[Number(((e.currentTarget as HTMLImageElement).parentNode as HTMLElement)?.id.replace("slot", ""))] = null
+                    props.setSlots(newSlots)
+                    e.preventDefault()
+                  }}
+                  onDrag={(e) => {
+                    props.setDropItem(e.currentTarget as HTMLImageElement)
+                  }}
+                />;
+                if (item == null) img = null
+                return (<td
+                  key={key}
+                  className='cragtingTableSlot'
+                  id={key}
+                  onDragOver={(e) => { drop(e, props.dropItem, false, props.result, props.pc, props.slots, props.setSlots) }}
+                  onDrop={(e) => { drop(e, props.dropItem, true, props.result, props.pc, props.slots, props.setSlots) }}
+                  onClick={(e) => { if (!props.pc) drop(e, props.dropItem, true, props.result, props.pc, props.slots, props.setSlots) }}>
+                  {img}
+                </td>)
               })}
             </tr>)
           })}
         </tbody>
       </table>
       <img id='craftingArrow' src={craftingTableArrow} alt="arrow" />
-      <div id='item'></div>
+      <div id='item'>
+        {props.craftedItem}
+      </div>
     </div>
   )
 }

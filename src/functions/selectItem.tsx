@@ -1,6 +1,6 @@
 import clickSound from "../assets/audio/click.mp3"
 
-function selectItem(e: React.MouseEvent, setDropItem: (element: HTMLElement | undefined) => void, pc: boolean) {
+function selectItem(e: React.MouseEvent, setDropItem: (element: HTMLImageElement | undefined) => void, pc: boolean) {
     const targetElement = e.currentTarget;
     const parentElement = targetElement.parentElement;
 
@@ -8,7 +8,7 @@ function selectItem(e: React.MouseEvent, setDropItem: (element: HTMLElement | un
         const clickAudio = new Audio(clickSound)
         clickAudio.preload = "auto"
         clickAudio.play()
-        setDropItem(e.currentTarget as HTMLElement)
+        setDropItem(e.currentTarget as HTMLImageElement)
         setTimeout(() => {
             const previouslySelected = document.getElementById("selected");
             if (previouslySelected) {

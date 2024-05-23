@@ -4,8 +4,10 @@ import { checkUserTip } from "./checkUserTip";
 import { Socket } from "socket.io-client";
 import { shapeless } from "./shapeless";
 import { nonShapeless } from "./nonshapeless";
+import { ReactNode } from "react";
 
-function findCraftingRecipe(craftingRecipe: Array<Array<string | null>>, originalRecipe: Array<string | null>, recipes: recipe[], item: HTMLElement | null, items: item[], socket: Socket | undefined) {
+function findCraftingRecipe(craftingRecipe: Array<Array<string | null>>, originalRecipe: Array<string | null>, recipes: recipe[], items: item[], socket: Socket | undefined, setCraftedItem: (value: ReactNode | null) => void, craftedItemsRecipe: Array<null | string>, setCraftedItemsRecipe: (value: Array<null | string>) => void) {
+  let craftableItem: null | ReactNode = null
   recipes.forEach(recipe => {
     let isRecipeCorrect = false
     if (recipe.shapeless) {
@@ -16,15 +18,28 @@ function findCraftingRecipe(craftingRecipe: Array<Array<string | null>>, origina
     if (isRecipeCorrect) {
       items.forEach(i => {
         if (i.name == recipe.item) {
-          let craftedItem = document.createElement("img")
-          craftedItem.src = i.image
-          craftedItem.draggable = false
-          craftedItem.addEventListener("click", () => { checkUserTip(i.name, craftingRecipe, originalRecipe, socket) })
-          item?.appendChild(craftedItem)
+          craftableItem = <img
+          src={i.image}
+          title={i.name}
+          draggable="false"
+          onClick={() => {
+            checkUserTip(i.name, craftingRecipe, originalRecipe, socket)
+          }}
+          />
         }
       });
     }
   });
+  let sameCraft = true
+  originalRecipe.forEach((item, index) => {
+    if(item != craftedItemsRecipe[index]){
+      sameCraft = false
+    }
+  });
+  if(!sameCraft){
+    setCraftedItem(craftableItem);
+    setCraftedItemsRecipe(originalRecipe)
+  }
 }
 
 export { findCraftingRecipe }
