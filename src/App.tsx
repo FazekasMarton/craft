@@ -112,6 +112,9 @@ function App() {
     setTimeout(() => {
       scrollTop()
     }, 0);
+    setTimeout(() => {
+      scrollTop()
+    }, 250);
   });
 
   useEffect(() => {
