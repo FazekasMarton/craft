@@ -3,7 +3,7 @@ import { findImage } from "../functions/findImage"
 import achievementSound from "../assets/audio/achievement.mp3"
 import clickSound from "../assets/audio/click.mp3"
 
-const achievementAudio = new Audio(achievementSound)
+let achievementAudio:null | HTMLAudioElement = new Audio(achievementSound)
 achievementAudio.preload = "auto"
 const clickAudio = new Audio(clickSound)
 clickAudio.preload = "auto"
@@ -11,7 +11,8 @@ clickAudio.preload = "auto"
 function Achievement(props: achievementProps) {
     let achievement = <></>
     if (props.result?.solved) {
-        achievementAudio.play()
+        achievementAudio?.play()
+        achievementAudio = null
         let item = props.result.tippedItems[props.result.tippedItems.length - 1]
         achievement = <div id='achievement'>
             <img id='achievementImage' src={findImage(item, props.items)} alt="solvedRidle" />
