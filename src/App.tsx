@@ -56,7 +56,8 @@ function checkPC(setPC: (value: boolean) => void) {
 function App() {
   const [timeOut, setTimeOut] = useState<null | ReturnType<typeof setTimeout>>(null);
   const [error, setError] = useState<error | null>(null);
-  const [count, setCount] = useState(0);
+  const [recipesCount, setRecipesCount] = useState(0);
+  const [itemsCount, setItemsCount] = useState(0);
   const [pc, setPC] = useState(checkPC(() => { }));
   const [items, setItems] = useState<item[]>([]);
   const [recipes, setRecipes] = useState<recipe[]>([]);
@@ -118,28 +119,28 @@ function App() {
   });
 
   useEffect(() => {
-    if (count < 10) {
+    if (itemsCount < 10) {
       fetch(`${url}/items`)
         .then(response => response.json())
         .then(data => setItems(data.data))
         .catch((_) => {
           setError(errorExample)
         })
-      setCount(count + 1)
+      setItemsCount(itemsCount + 1)
     }
-  }, [count]);
+  }, [itemsCount]);
 
   useEffect(() => {
-    if (count < 10) {
+    if (recipesCount < 10) {
       fetch(`${url}/recipes`)
         .then(response => response.json())
         .then(data => setRecipes(data.data))
         .catch((_) => {
           setError(errorExample)
         })
-      setCount(count + 1)
+      setRecipesCount(recipesCount + 1)
     }
-  }, [count]);
+  }, [recipesCount]);
 
   craft(recipes, items, socket, craftingTableSlots, setCraftedItem, craftedItemsRecipe, setCraftedItemsRecipe)
 
