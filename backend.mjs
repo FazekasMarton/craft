@@ -131,8 +131,8 @@ function createPossibleCombinations(riddle, data){
 
 function markMatches(result, tip, riddle){
     let data = gatherCorrectItems(riddle.recipe)
-    let materials = data.items;
-    let solved = result.matches == data.essentialItems.length && result.matches == gatherCorrectItems(tip).essentialItems.length;
+    let materials = data.shapedItems;
+    let solved = result.matches == data.essentialItemsNum && result.matches == gatherCorrectItems(tip).essentialItemsNum;
     let matches = [];
     for (let i = 0; i < result.matchingMatrix.length; i++) {
         for (let j = 0; j < result.matchingMatrix[i].length; j++) {
@@ -151,6 +151,17 @@ function markMatches(result, tip, riddle){
             matches.push(obj);
         }
     }
+
+    function removeCorrectItem(material){
+        for(let i = 0; i < materials.length; i++){
+            if((Array.isArray(materials[i]) && materials[i].includes(material)) || materials[i] == material){
+                materials.pop(materials[i]);
+                return true;
+            };
+        };
+        return false;
+    };
+
     matches.forEach(match => {
         let key = Object.keys(match)[0];
         if (match[key] == "waiting") { 
@@ -240,7 +251,7 @@ function checkShapelessRecipe(riddle, data){
     let matches = 0;
     let mats = gatherCorrectItems(riddle.recipe);
     let wrongMat = false;
-    let correctMaterials = mats.items
+    let correctMaterials = mats.shapelessItems
     data.originalRecipe.forEach(item => {
         let obj = {};
             let key = item;
@@ -255,31 +266,33 @@ function checkShapelessRecipe(riddle, data){
             }
             result.push(obj);
     });
-    let solved = matches == mats.essentialItems.length && !wrongMat;
+    let solved = matches == mats.essentialItemsNum && !wrongMat;
     return {matches: result, solved: solved};
 }
 
 function gatherCorrectItems(recipe){
-    let items = [];
-    let essentialItems = []
+    let shapelessItems = [];
+    let shapedItems = [];
+    let essentialItemsNum = 0
     recipe.forEach(row => {
         row.forEach(cell => {
             if(Array.isArray(cell)){
                 if(!cell.includes(null)){
-                    essentialItems.push(cell[0]);
+                    essentialItemsNum++;
                 }
                 cell.forEach(item => {
                     if(item != null){
-                        items.push(item);
+                        shapelessItems.push(item);
                     };
                 });
             }else if(cell != null){
-                items.push(cell);
-                essentialItems.push(cell);
+                shapelessItems.push(cell);
+                essentialItemsNum++;
+                shapedItems.push(cell)
             };
         });
     });
-    return {items: items, essentialItems: essentialItems};
+    return {items: items, essentialItemsNum: essentialItemsNum, shapelessItems: shapelessItems, shapedItems: shapedItems};
 };
 
 async function getData(admin) {
