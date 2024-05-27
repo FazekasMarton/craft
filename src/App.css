@@ -45,7 +45,10 @@ img {
   grid-area: craftingTable;
   display: grid;
   align-items: center;
-  grid-template-columns: -webkit-max-content;
+  -webkit-grid-template-columns: max-content;
+  -moz-grid-template-columns: max-content;
+  -ms-grid-template-columns: max-content;
+  grid-template-columns: max-content;
   grid-template-areas:
     "title . ."
     "craft arrow item";
@@ -342,6 +345,7 @@ table .correct {
   color: white;
   width: fit-content;
   justify-self: end;
+  font-family: MinecraftRegular;
 }
 
 #achievementText {
@@ -363,7 +367,7 @@ table .correct {
   left: 50%;
   transform: translate(-50%, -50%);
   background-color: rgb(51, 50, 50);
-  background-image: url("./assets/error-bg.jpg");
+  background-image: url("./assets/image/error-bg.jpg");
   background-position: center;
   background-size: cover;
   max-width: 700px;

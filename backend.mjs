@@ -5,8 +5,25 @@ import { fileURLToPath } from 'url';
 import bodyParser from "body-parser"
 import http from 'http';
 import { Server } from 'socket.io';
+import admin from "firebase-admin"
+import dotenv from "dotenv"
 
 //***************************************DEFINING SERVER *************************************************/
+
+dotenv.config()
+
+const recipesDbServiceAccount = JSON.parse(process.env.RecipesKey)
+const itemsDbServiceAccount = JSON.parse(process.env.ItemsKey)
+
+const recipesDbAdmin = admin.initializeApp({
+    credential: admin.credential.cert(recipesDbServiceAccount),
+    databaseURL: "https://craftdle---recipes-f8dd6-default-rtdb.europe-west1.firebasedatabase.app"
+}, "recipes");
+
+const itemsDbAdmin = admin.initializeApp({
+    credential: admin.credential.cert(itemsDbServiceAccount),
+    databaseURL: "https://craftdle-4ce47-default-rtdb.europe-west1.firebasedatabase.app"
+}, "items");
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -39,14 +56,14 @@ let riddles = {}
 
 app.get("/items", async(req, res) => {
     if(items == null){
-        items = await getData("https://craftdle-4ce47-default-rtdb.europe-west1.firebasedatabase.app/.json")
+        items = await getData(itemsDbAdmin)
     }
     res.send(items)
 })
 
-app.get("/recipes", (req, res) => {
+app.get("/recipes", async(req, res) => {
     if(recipes == null){
-        convertRecipes()
+        await convertRecipes()
     }
     res.send({data: recipes})
 })
@@ -65,11 +82,20 @@ io.on('connection', async(socket) => {
                 result = createPossibleCombinations(riddles[socket.id].riddle, data);
             }
             riddles[socket.id]["tippedRecipes"].push(result.matches);
-            console.log(result.solved)
-            socket.emit("checkTip", {tippedRecipes: riddles[socket.id]["tippedRecipes"], tippedItems: riddles[socket.id]["tippedItems"], solved: result.solved});
-            getHints(socket)
+            socket.emit("checkTip", {
+                result: {
+                    tippedRecipes: riddles[socket.id]["tippedRecipes"], 
+                    tippedItems: riddles[socket.id]["tippedItems"], 
+                    solved: result.solved
+                },
+                hints: getHints(socket)
+            });
         };
     });
+
+    socket.on("newRiddle", () => {
+        createRiddle(socket)
+    })
 
     socket.on("disconnect", () => {
         delete riddles[socket.id]
@@ -93,7 +119,7 @@ function getHints(socket){
             }
         }
     }
-    socket.emit("hints", hints)
+    return hints
 }
 
 function createPossibleCombinations(riddle, data){
@@ -256,16 +282,16 @@ function gatherCorrectItems(recipe){
     return {items: items, essentialItems: essentialItems};
 };
 
-async function getData(url){
-    let return_data = {}
-    await fetch(url)
-    .then(response => response.json())
-    .then(data => return_data = data)
-    return return_data
+async function getData(admin) {
+    const db = admin.database();
+    const ref = db.ref('/');
+    const snapshot = await ref.once('value');
+    const data = snapshot.val();
+    return data
 }
 
 async function convertRecipes(){
-    recipes = await getData("https://craftdle---recipes-f8dd6-default-rtdb.europe-west1.firebasedatabase.app/.json");
+    recipes = await getData(recipesDbAdmin);
     recipes = recipes.data
     recipes.forEach(recipe => {
         recipe = convertRiddle(recipe)
@@ -286,7 +312,7 @@ async function createRiddle(socket){
     riddles[socket.id]["tippedItems"] = []
     riddles[socket.id]["hints"] = await generateHints(riddle)
     riddles[socket.id]["tippedRecipes"] = [];
-    console.log(riddles[socket.id].riddle)
+    console.log(riddles)
 }
 
 async function generateHints(riddle){
@@ -321,7 +347,7 @@ function randomizeMaterial(materials){
 
 async function getStackSize(item_name){
     if(items == null){
-        items = await getData("https://craftdle-4ce47-default-rtdb.europe-west1.firebasedatabase.app/.json")
+        items = await getData(itemsDbAdmin)
     }
     let stack_size = undefined
     items.data.forEach(item => {
@@ -332,20 +358,20 @@ async function getStackSize(item_name){
 
 function convertRiddle(riddle){
     let craft_matrix = [[],[],[]]
+    let recipe = []
     let col = 0
     let row = 0
-    if(!Array.isArray(riddle.recipe)){
-        let recipe = []
-        for (let i = 0; i < 9; i++) {
-            if(riddle.recipe[i] == undefined){
-                recipe.push(null)
-            }else{
-                recipe.push(riddle.recipe[i])
-            }
+
+    for (let i = 0; i < 9; i++) {
+        let material = riddle.recipe[i];
+        if(material == null || material == undefined){
+            recipe.push(null)
+        }else{
+            recipe.push(material)
         }
-        riddle.recipe = recipe
     }
-    riddle.recipe.forEach(material => {
+
+    recipe.forEach(material => {
         craft_matrix[row].push(material)
         col++
         if(col == 3){

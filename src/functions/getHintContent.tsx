@@ -1,3 +1,5 @@
+import clickSound from "../assets/audio/click.mp3"
+
 function getHintContent(numberOfTips: number, hint: number | string | null, hintNumber: number, usedHint: boolean[], setUsedHint: (value: boolean[]) => void) {
     let content = <></>
     if (hint == null) {
@@ -6,9 +8,14 @@ function getHintContent(numberOfTips: number, hint: number | string | null, hint
         content = <div className='hint'>{hint}</div>
     } else {
         content = <button onClick={() => {
+            const clickAudio = new Audio(clickSound)
+            clickAudio.preload = "auto"
+            clickAudio.play()
             const updatedUsedHint = [...usedHint];
             updatedUsedHint[hintNumber] = true;
-            setUsedHint(updatedUsedHint);
+            setTimeout(() => {
+                setUsedHint(updatedUsedHint);
+            }, clickAudio.duration * 500);
         }}>Reveal hint</button>
     }
     return content

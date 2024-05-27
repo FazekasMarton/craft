@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, ReactNode } from 'react'
 import { item } from './interfaces/item.tsx';
 import { recipe } from './interfaces/recipe.tsx';
 import { hints } from './interfaces/hints.tsx';
@@ -10,19 +10,23 @@ import { Items } from './components/Items.tsx';
 import { Achievement } from './components/Achievement.tsx';
 import { Error } from './components/Error.tsx';
 import io from 'socket.io-client';
+import dropSound from "./assets/audio/drop.mp3"
+import { craft } from './functions/craft.tsx';
+import { restart } from './functions/restart.tsx';
+
+const dropAudio = new Audio(dropSound)
+dropAudio.preload = "auto"
 
 const url: string = getBackendURL()
 const socket = io(url)
 
-function clearInputs() {
-  for (let i = 0; i < 9; i++) {
-    const element = document.getElementById(`slot${i}`);
-    if (element) {
-      element.innerHTML = "";
-    }
-  }
-  let item = document.getElementById("item")
-  item?.childNodes[0]?.remove()
+function clearInputs(craftingTableSlots: Array<HTMLImageElement | null>, setCraftingTableSlots: (value: Array<HTMLImageElement | null>) => void) {
+  dropAudio.play()
+  let newSlots = [...craftingTableSlots]
+  newSlots.forEach((_, index) => {
+    newSlots[index] = null
+  });
+  setCraftingTableSlots(newSlots)
 }
 
 function getBackendURL() {
@@ -33,31 +37,43 @@ function getBackendURL() {
   return url
 }
 
-function scrollTop() {
+function scrollTop(tips: number, round: number) {
   const tipsList: HTMLElement | null = document.getElementById('tipsList');
-  if (tipsList) {
-    tipsList.scrollTo({
-      top: tipsList.scrollHeight * -1,
-      behavior: "smooth"
-    })
+  if(tips != tipsList?.childNodes.length && round < 100){
+    setTimeout(() => {
+      let nextRound = round + 1
+      scrollTop(tips, nextRound)
+    }, 100);
+  }else{
+    if (tipsList) {
+      tipsList.scrollTo({
+        top: tipsList.scrollHeight * -1,
+        behavior: "smooth"
+      })
+    }
   }
 }
 
 function checkPC(setPC: (value: boolean) => void) {
-  const agent = navigator.userAgent.toLocaleLowerCase()
-  const pc = !/mobile|android|iphone|ipod|blackberry|windows phone|tablet|ipad|macintosh/i.test(agent)
+  const agent = navigator.userAgent
+  const pc = !(/mobile|android|iphone|ipod|blackberry|windows phone|tablet|ipad|macintosh/i.test(agent.toLocaleLowerCase()) || /TV/i.test(agent))
   setPC(pc)
   return pc
 }
 
 function App() {
+  const [timeOut, setTimeOut] = useState<null | ReturnType<typeof setTimeout>>(null);
   const [error, setError] = useState<error | null>(null);
-  const [count, setCount] = useState(0);
+  const [recipesCount, setRecipesCount] = useState(0);
+  const [itemsCount, setItemsCount] = useState(0);
   const [pc, setPC] = useState(checkPC(() => { }));
   const [items, setItems] = useState<item[]>([]);
   const [recipes, setRecipes] = useState<recipe[]>([]);
   const [search, setSearch] = useState("");
-  const [dropItem, setDropItem] = useState<HTMLElement>();
+  const [dropItem, setDropItem] = useState<HTMLImageElement>();
+  const [craftingTableSlots, setCraftingTableSlots] = useState<Array<null | HTMLImageElement>>(new Array(9).fill(null));
+  const [craftedItem, setCraftedItem] = useState<ReactNode | null>(null);
+  const [craftedItemsRecipe, setCraftedItemsRecipe] = useState<Array<null | string>>(new Array(9).fill(null));
   const [hints, setHints] = useState<hints>({
     tips: 0,
     hint1: null,
@@ -83,55 +99,65 @@ function App() {
     checkPC(setPC)
   })
 
-  if(!socket.connected && items.length > 0 && recipes.length > 0 && error == null){
-    setError(errorExample)
-  }else if(socket.connected && error != null){
-    location.reload()
+  if (!socket.connected && items.length > 0 && recipes.length > 0 && error == null && timeOut == null) {
+    setTimeOut(
+      setTimeout(() => {
+        setError(errorExample)
+      }, 5000)
+    )
+  } else if (socket.connected && error != null) {
+    restart(setSearch, setDropItem, setCraftingTableSlots, setCraftedItem, setCraftedItemsRecipe, setHints, setUsedHints, setResult)
+  } else {
+    if (timeOut != null) clearTimeout(timeOut)
   }
 
-  socket.on("hints", data => {
-    setHints(data);
-  });
+  useEffect(() => {
+    socket.on("checkTip", async (data) => {
+      setHints(data.hints);
+      setResult(data.result);
+      clearInputs(craftingTableSlots, setCraftingTableSlots)
+      setTimeout(() => {
+        scrollTop(data.hints.tips, 1)
+      }, 0);
+    });
 
-  socket.on("checkTip", data => {
-    setResult(data);
-    clearInputs()
-    setTimeout(() => {
-      scrollTop()
-    }, 1);
-  });
+    return () => {
+      socket.off('checkTip');
+    };
+  }, []);
 
   useEffect(() => {
-    if (count < 10) {
+    if (itemsCount < 10) {
       fetch(`${url}/items`)
         .then(response => response.json())
         .then(data => setItems(data.data))
         .catch((_) => {
           setError(errorExample)
         })
-      setCount(count + 1)
+      setItemsCount(itemsCount + 1)
     }
-  }, [count]);
+  }, [itemsCount]);
 
   useEffect(() => {
-    if (count < 10) {
+    if (recipesCount < 10) {
       fetch(`${url}/recipes`)
         .then(response => response.json())
         .then(data => setRecipes(data.data))
         .catch((_) => {
           setError(errorExample)
         })
-      setCount(count + 1)
+      setRecipesCount(recipesCount + 1)
     }
-  }, [count]);
+  }, [recipesCount]);
 
+  craft(recipes, items, socket, craftingTableSlots, setCraftedItem, craftedItemsRecipe, setCraftedItemsRecipe)
 
   return (
     <>
-      <CraftingTable craftingTableSize={craftingTableSize} dropItem={dropItem} setDropItem={setDropItem} recipes={recipes} items={items} result={result} pc={pc} socket={socket} />
+      <CraftingTable craftingTableSize={craftingTableSize} dropItem={dropItem} setDropItem={setDropItem} result={result} pc={pc} slots={craftingTableSlots} setSlots={setCraftingTableSlots} craftedItem={craftedItem} />
       <Tips hints={hints} craftingTableSize={craftingTableSize} result={result} items={items} usedHints={usedHints} setUsedHints={setUsedHints} />
-      <Items dropItem={dropItem} recipes={recipes} items={items} setSearch={setSearch} search={search} setDropItem={setDropItem} pc={pc} socket={socket} />
-      <Achievement result={result} items={items}/>
+      <Items dropItem={dropItem} recipes={recipes} items={items} setSearch={setSearch} search={search} setDropItem={setDropItem} pc={pc} socket={socket} slots={craftingTableSlots} setSlots={setCraftingTableSlots} />
+      <Achievement result={result} items={items} setResult={setResult} setSearch={setSearch} setDropItem={setDropItem} setCraftingTableSlots={setCraftingTableSlots} setCraftedItem={setCraftedItem} setCraftedItemsRecipe={setCraftedItemsRecipe} setHints={setHints} setUsedHints={setUsedHints} socket={socket}/>
       <Error error={error} />
     </>
   )

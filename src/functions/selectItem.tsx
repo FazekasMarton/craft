@@ -1,14 +1,21 @@
-function selectItem(e: React.MouseEvent, setDropItem: (element: HTMLElement | undefined) => void, pc: boolean) {
+import clickSound from "../assets/audio/click.mp3"
+
+function selectItem(e: React.MouseEvent, setDropItem: (element: HTMLImageElement | undefined) => void, pc: boolean) {
     const targetElement = e.currentTarget;
     const parentElement = targetElement.parentElement;
 
     if (parentElement && !pc) {
-        setDropItem(e.currentTarget as HTMLElement)
-        const previouslySelected = document.getElementById("selected");
-        if (previouslySelected) {
-            previouslySelected.removeAttribute("id");
-        }
-        parentElement.id = "selected";
+        const clickAudio = new Audio(clickSound)
+        clickAudio.preload = "auto"
+        clickAudio.play()
+        setDropItem(e.currentTarget as HTMLImageElement)
+        setTimeout(() => {
+            const previouslySelected = document.getElementById("selected");
+            if (previouslySelected) {
+                previouslySelected.removeAttribute("id");
+            }
+            parentElement.id = "selected";
+        }, clickAudio.duration * 250);
     }
 }
 

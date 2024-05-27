@@ -1,17 +1,15 @@
-import { Socket } from 'socket.io-client';
-import { item } from './item.tsx';
-import { recipe } from './recipe.tsx';
+import { ReactNode } from 'react';
 import { tips } from './tips.tsx';
 
 interface craftingTableProps {
     craftingTableSize: any[];
-    dropItem: HTMLElement | undefined;
-    setDropItem: (element: HTMLElement | undefined) => void;
-    recipes: recipe[];
-    items: item[];
+    dropItem: HTMLImageElement | undefined;
+    setDropItem: (element: HTMLImageElement | undefined) => void;
     result: tips | undefined;
     pc: boolean;
-    socket: Socket | undefined
+    slots: Array<null | HTMLImageElement>,
+    setSlots: (value: Array<null | HTMLImageElement>) => void,
+    craftedItem: null | ReactNode
 }
 
 export type { craftingTableProps }
