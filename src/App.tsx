@@ -37,18 +37,19 @@ function getBackendURL() {
 }
 
 function scrollTop(tips: number, round: number) {
-  console.log(tips)
   const tipsList: HTMLElement | null = document.getElementById('tipsList');
-  if (tipsList) {
-    tipsList.scrollTo({
-      top: tipsList.scrollHeight * -1,
-      behavior: "smooth"
-    })
-  }
   if(tips != tipsList?.childNodes.length && round < 100){
     setTimeout(() => {
-      scrollTop(tips, round++)
-    }, round * 100);
+      let nextRound = round + 1
+      scrollTop(tips, nextRound)
+    }, 100);
+  }else{
+    if (tipsList) {
+      tipsList.scrollTo({
+        top: tipsList.scrollHeight * -1,
+        behavior: "smooth"
+      })
+    }
   }
 }
 
@@ -108,15 +109,21 @@ function App() {
   } else {
     if (timeOut != null) clearTimeout(timeOut)
   }
-  
-  socket.on("checkTip", async (data) => {
-    setHints(data.hints);
-    setResult(data.result);
-    clearInputs(craftingTableSlots, setCraftingTableSlots)
-    setTimeout(() => {
-      scrollTop(data.hints.tips, 1)
-    }, 0);
-  });
+
+  useEffect(() => {
+    socket.on("checkTip", async (data) => {
+      setHints(data.hints);
+      setResult(data.result);
+      clearInputs(craftingTableSlots, setCraftingTableSlots)
+      setTimeout(() => {
+        scrollTop(data.hints.tips, 1)
+      }, 0);
+    });
+
+    return () => {
+      socket.off('checkTip');
+    };
+  }, []);
 
   useEffect(() => {
     if (itemsCount < 10) {
