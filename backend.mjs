@@ -90,11 +90,12 @@ io.on('connection', async(socket) => {
                 },
                 hints: getHints(socket)
             });
-            
         };
     });
 
-    console.log(riddles)
+    socket.on("newRiddle", () => {
+        createRiddle(socket)
+    })
 
     socket.on("disconnect", () => {
         delete riddles[socket.id]
@@ -311,6 +312,7 @@ async function createRiddle(socket){
     riddles[socket.id]["tippedItems"] = []
     riddles[socket.id]["hints"] = await generateHints(riddle)
     riddles[socket.id]["tippedRecipes"] = [];
+    console.log(riddles)
 }
 
 async function generateHints(riddle){

@@ -12,6 +12,7 @@ import { Error } from './components/Error.tsx';
 import io from 'socket.io-client';
 import dropSound from "./assets/audio/drop.mp3"
 import { craft } from './functions/craft.tsx';
+import { restart } from './functions/restart.tsx';
 
 const dropAudio = new Audio(dropSound)
 dropAudio.preload = "auto"
@@ -105,7 +106,7 @@ function App() {
       }, 5000)
     )
   } else if (socket.connected && error != null) {
-    location.reload()
+    restart(setSearch, setDropItem, setCraftingTableSlots, setCraftedItem, setCraftedItemsRecipe, setHints, setUsedHints, setResult)
   } else {
     if (timeOut != null) clearTimeout(timeOut)
   }
@@ -156,7 +157,7 @@ function App() {
       <CraftingTable craftingTableSize={craftingTableSize} dropItem={dropItem} setDropItem={setDropItem} result={result} pc={pc} slots={craftingTableSlots} setSlots={setCraftingTableSlots} craftedItem={craftedItem} />
       <Tips hints={hints} craftingTableSize={craftingTableSize} result={result} items={items} usedHints={usedHints} setUsedHints={setUsedHints} />
       <Items dropItem={dropItem} recipes={recipes} items={items} setSearch={setSearch} search={search} setDropItem={setDropItem} pc={pc} socket={socket} slots={craftingTableSlots} setSlots={setCraftingTableSlots} />
-      <Achievement result={result} items={items} />
+      <Achievement result={result} items={items} setResult={setResult} setSearch={setSearch} setDropItem={setDropItem} setCraftingTableSlots={setCraftingTableSlots} setCraftedItem={setCraftedItem} setCraftedItemsRecipe={setCraftedItemsRecipe} setHints={setHints} setUsedHints={setUsedHints} socket={socket}/>
       <Error error={error} />
     </>
   )
