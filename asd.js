@@ -54,81 +54,52 @@ let items = null
 let recipes = null
 let riddles = {}
 
-app.get("/items", async (req, res) => {
-    try {
-        if (items == null) {
-            items = await getData(itemsDbAdmin);
-        }
-        // Ellenőrizd, hogy items valóban egy tömb-e, ha null vagy undefined
-        if (!Array.isArray(items)) {
-            items = []; // Ha nem tömb, üres tömbként kezeli
-        }
-        res.send({ data: items });
-    } catch (error) {
-        console.error("Error fetching items:", error);
-        res.status(500).send({ error: "Failed to fetch items. Please try again later." });
+app.get("/items", async(req, res) => {
+    if(items == null){
+        items = await getData(itemsDbAdmin)
     }
-});
+    res.send(items)
+})
 
-app.get("/recipes", async (req, res) => {
-    try {
-        if (recipes == null) {
-            await convertRecipes();
-        }
-        res.send({ data: recipes });
-    } catch (error) {
-        console.error("Error fetching recipes:", error);
-        res.status(500).send({ error: "Failed to fetch recipes. Please try again later." });
+app.get("/recipes", async(req, res) => {
+    if(recipes == null){
+        await convertRecipes()
     }
-});
+    res.send({data: recipes})
+})
 
-io.on('connection', async (socket) => {
-    try {
-        await createRiddle(socket);
-    } catch (error) {
-        console.error("Error on connection:", error);
-        socket.emit("error", { error: "Failed to initialize riddle. Please try again later." });
-    }
+io.on('connection', async(socket) => {
+    await createRiddle(socket)
 
     socket.on("checkTip", (data) => {
-        try {
-            if (!riddles[socket.id]["tippedItems"].includes(data.craftedItem)) {
-                riddles[socket.id]["tips"]++;
-                riddles[socket.id]["tippedItems"].push(data.craftedItem);
-                let result = [];
-                if (riddles[socket.id].riddle.shapeless) {
-                    result = checkShapelessRecipe(riddles[socket.id].riddle, data);
-                } else {
-                    result = createPossibleCombinations(riddles[socket.id].riddle, data);
-                }
-                riddles[socket.id]["tippedRecipes"].push(result.matches);
-                socket.emit("checkTip", {
-                    result: {
-                        tippedRecipes: riddles[socket.id]["tippedRecipes"],
-                        tippedItems: riddles[socket.id]["tippedItems"],
-                        solved: result.solved
-                    },
-                    hints: getHints(socket)
-                });
+        if(!riddles[socket.id]["tippedItems"].includes(data.craftedItem)){
+            riddles[socket.id]["tips"]++;
+            riddles[socket.id]["tippedItems"].push(data.craftedItem);
+            let result = [];
+            if(riddles[socket.id].riddle.shapeless){
+                result = checkShapelessRecipe(riddles[socket.id].riddle, data);
+            }else{
+                result = createPossibleCombinations(riddles[socket.id].riddle, data);
             }
-        } catch (error) {
-            console.error("Error on checkTip:", error);
-            socket.emit("error", { error: "Failed to process tip. Please try again later." });
-        }
+            riddles[socket.id]["tippedRecipes"].push(result.matches);
+            socket.emit("checkTip", {
+                result: {
+                    tippedRecipes: riddles[socket.id]["tippedRecipes"], 
+                    tippedItems: riddles[socket.id]["tippedItems"], 
+                    solved: result.solved
+                },
+                hints: getHints(socket)
+            });
+        };
     });
 
-    socket.on("newRiddle", async () => {
-        try {
-            await createRiddle(socket);
-        } catch (error) {
-            console.error("Error on newRiddle:", error);
-            socket.emit("error", { error: "Failed to create new riddle. Please try again later." });
-        }
-    });
+    socket.on("newRiddle", () => {
+        createRiddle(socket)
+    })
 
     socket.on("disconnect", () => {
-        delete riddles[socket.id];
-    });
+        delete riddles[socket.id]
+    })
 });
 
 function getHints(socket){
@@ -315,51 +286,36 @@ function gatherCorrectItems(recipe){
 };
 
 async function getData(admin) {
-    try {
-        const db = admin.database();
-        const ref = db.ref('/');
-        const snapshot = await ref.once('value');
-        const data = snapshot.val();
-        return data;
-    } catch (error) {
-        console.error("Error getting data from database:", error);
-        throw new Error("Database fetch error");
-    }
+    const db = admin.database();
+    const ref = db.ref('/');
+    const snapshot = await ref.once('value');
+    const data = snapshot.val();
+    return data
 }
 
-async function convertRecipes() {
-    try {
-        recipes = await getData(recipesDbAdmin);
-        recipes = recipes.data;
-        recipes.forEach(recipe => {
-            recipe = convertRiddle(recipe);
-        });
-    } catch (error) {
-        console.error("Error converting recipes:", error);
-        throw new Error("Recipe conversion error");
-    }
+async function convertRecipes(){
+    recipes = await getData(recipesDbAdmin);
+    recipes = recipes.data
+    recipes.forEach(recipe => {
+        recipe = convertRiddle(recipe)
+    });
 }
 
-async function createRiddle(socket) {
-    try {
-        if (recipes == null) {
-            await convertRecipes();
-        }
-        let riddle;
-        do {
-            riddle = recipes[Math.floor(Math.random() * recipes.length)];
-        } while (!validateRiddle(riddle));
-        riddles[socket.id] = {};
-        riddles[socket.id]["riddle"] = riddle;
-        riddles[socket.id]["tips"] = 0;
-        riddles[socket.id]["tippedItems"] = [];
-        riddles[socket.id]["hints"] = await generateHints(riddle);
-        riddles[socket.id]["tippedRecipes"] = [];
-        console.log(riddles);
-    } catch (error) {
-        console.error("Error creating riddle:", error);
-        socket.emit("error", { error: "Failed to create riddle. Please try again later." });
+async function createRiddle(socket){
+    if(recipes == null){
+        await convertRecipes()
     }
+    let riddle
+    do {
+        riddle = recipes[Math.floor(Math.random() * recipes.length)];
+    } while (!validateRiddle(riddle));
+    riddles[socket.id] = {}
+    riddles[socket.id]["riddle"] = riddle
+    riddles[socket.id]["tips"] = 0
+    riddles[socket.id]["tippedItems"] = []
+    riddles[socket.id]["hints"] = await generateHints(riddle)
+    riddles[socket.id]["tippedRecipes"] = [];
+    console.log(riddles)
 }
 
 async function generateHints(riddle){
@@ -394,19 +350,12 @@ function randomizeMaterial(materials){
 
 async function getStackSize(item_name){
     if(items == null){
-        try {
-            items = await getData(itemsDbAdmin)
-        } catch (error) {
-            console.error("Error fetching items:", error);
-            throw new Error("Failed to fetch items from database");
-        }
+        items = await getData(itemsDbAdmin)
     }
     let stack_size = undefined
-    if(items && items.data) {
-        items.data.forEach(item => {
-            if(item.name == item_name) stack_size = item.stackSize
-        });
-    }
+    items.data.forEach(item => {
+        if(item.name == item_name) stack_size = item.stackSize
+    });
     return stack_size
 }
 
