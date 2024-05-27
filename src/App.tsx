@@ -150,6 +150,10 @@ function App() {
     }
   }, [recipesCount]);
 
+  useEffect(() => {
+    socket.emit("newRiddle")
+  }, []);
+
   craft(recipes, items, socket, craftingTableSlots, setCraftedItem, craftedItemsRecipe, setCraftedItemsRecipe)
 
   return (
