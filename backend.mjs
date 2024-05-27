@@ -82,8 +82,15 @@ io.on('connection', async(socket) => {
                 result = createPossibleCombinations(riddles[socket.id].riddle, data);
             }
             riddles[socket.id]["tippedRecipes"].push(result.matches);
-            socket.emit("checkTip", {tippedRecipes: riddles[socket.id]["tippedRecipes"], tippedItems: riddles[socket.id]["tippedItems"], solved: result.solved});
-            getHints(socket)
+            socket.emit("checkTip", {
+                result: {
+                    tippedRecipes: riddles[socket.id]["tippedRecipes"], 
+                    tippedItems: riddles[socket.id]["tippedItems"], 
+                    solved: result.solved
+                },
+                hints: getHints(socket)
+            });
+            
         };
     });
 
@@ -111,7 +118,7 @@ function getHints(socket){
             }
         }
     }
-    socket.emit("hints", hints)
+    return hints
 }
 
 function createPossibleCombinations(riddle, data){
