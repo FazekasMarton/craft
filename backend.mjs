@@ -162,9 +162,9 @@ io.on('connection', async (socket) => {
         let streak = riddles[socket.id]?.streak
         if (streak > 0) {
             await addStreak(streak)
-            io.to("admin").emit("users", await getUsersData())
         }
         delete riddles[socket.id]
+        io.to("admin").emit("users", await getUsersData())
     })
 });
 
