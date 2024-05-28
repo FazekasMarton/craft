@@ -101,6 +101,7 @@ io.on('connection', async (socket) => {
 
     socket.on("checkTip", (data) => {
         try {
+            console.log("megjött");
             if (!riddles[socket.id]["tippedItems"].includes(data.craftedItem)) {
                 riddles[socket.id]["tips"]++;
                 riddles[socket.id]["tippedItems"].push(data.craftedItem);
@@ -121,6 +122,7 @@ io.on('connection', async (socket) => {
                 });
             }
         } catch (e) {
+            console.log("elkaptam")
             socket.emit('error', { error: e.message });
         }
     });
