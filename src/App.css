@@ -50,14 +50,29 @@ img {
   -ms-grid-template-columns: max-content;
   grid-template-columns: max-content;
   grid-template-areas:
-    "title . ."
-    "craft arrow item";
+    ". title . ."
+    "patreon craft arrow item";
   justify-content: center;
   width: min-content;
   height: min-content;
   padding: 3vmin;
   gap: 0 2vmin;
   margin: auto;
+}
+
+#supportUs{
+  grid-area: patreon;
+  width: 8vmin;
+  height: 8vmin;
+  background-color: rgb(196, 199, 196);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-top: 2px solid rgb(254, 255, 255);
+  border-right: 2px solid rgb(57, 56, 56);
+  border-bottom: 2px solid rgb(51, 50, 50);
+  border-left: 2px solid rgb(255, 254, 254);
 }
 
 .tipCrafting {
@@ -406,7 +421,7 @@ table .correct {
   margin: auto;
 }
 
-@media only screen and (max-width: 821px) {
+@media only screen and (max-width: 895px) {
   #itemBar {
     flex-direction: column;
     padding: 0;

@@ -1,11 +1,19 @@
 import craftingTableArrow from '../assets/image/craftingtablearrow.png'
+import patreon from "../assets/image/patreon-icon.png"
 import { craftingTableProps } from "../interfaces/craftingTableProps"
 import { drop } from "../functions/drop"
 import { ReactNode } from 'react'
+import clickSound from "../assets/audio/click.mp3"
+
+const clickAudio = new Audio(clickSound)
+clickAudio.preload = "auto"
 
 function CraftingTable(props: craftingTableProps) {
   return (
     <div id='craftingTable'>
+      <a id='supportUs' href="https://patreon.com/Craftdle" target='_blank' onClick={() => {clickAudio.play()}}>
+        <img src={patreon} alt="SupportUs" />
+      </a>
       <div id='craftingTitle'>Crafting</div>
       <table>
         <tbody>
