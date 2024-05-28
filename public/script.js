@@ -19,6 +19,8 @@ socket.on("users", data => {
 function displayData(data){
     let today = data.todayDate
     document.getElementById("currentPlayers").innerText = `Current Players: ${data.currentPlayers}`
+    document.getElementById("todaysPlayers").innerText = `Today's Visitors: ${data.date[today].visitors}`
+    document.getElementById("todaysSolvedRiddles").innerText = `Riddles Solved Today: ${data.date[today].solvedRiddles}`
     document.getElementById("streakPerPlayers").innerText = `Average Game Played In A Row: ${avg(data.streakPerPlayers)}`
     updateUsersPerDayChart(data.date, today)
 }
@@ -44,12 +46,12 @@ function updateUsersPerDayChart(data, today){
         borderWidth: 1
       }
     Object.keys(data).some(date => {
+      if(date == today){
+          return true
+      }
         bars.push(date)
         visitorsPerDay.data.push(data[date].visitors)
         solvedRiddlesPerDay.data.push(data[date].solvedRiddles)
-        if(date == today){
-            return true
-        }
         return false
     });
     users_per_day_chart.data.labels = bars

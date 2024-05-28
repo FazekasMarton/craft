@@ -131,35 +131,39 @@ io.on('connection', async(socket) => {
 });
 
 async function addStreak(streak) {
-    const db = usersDbAdmin.database();
-    const ref = db.ref(`/streakPerPlayers`);
-    await ref.transaction(currentData => {
-        if (!Array.isArray(currentData)) {
-            return [streak];
-        } else {
-            currentData.push(streak);
-            return currentData;
-        }
-    });
+    if(port != 6969){
+        const db = usersDbAdmin.database();
+        const ref = db.ref(`/streakPerPlayers`);
+        await ref.transaction(currentData => {
+            if (!Array.isArray(currentData)) {
+                return [streak];
+            } else {
+                currentData.push(streak);
+                return currentData;
+            }
+        });
+    }
 }
 
 async function updateUsersData(path) {
-    const db = usersDbAdmin.database();
-    const userRef = db.ref(`/date/${getTodayDate()}/`);
-    const snapshot = await userRef.once('value');
-    const dataRef = userRef.child(path);
-    if(!snapshot.exists()){
-        userRef.set({
-            "visitors": 0,
-            "solvedRiddles": 0
-        })
-    }
-    await dataRef.transaction((currentData) => {
-        if (currentData === null) {
-            return 1;
+    if(port != 6969){
+        const db = usersDbAdmin.database();
+        const userRef = db.ref(`/date/${getTodayDate()}/`);
+        const snapshot = await userRef.once('value');
+        const dataRef = userRef.child(path);
+        if(!snapshot.exists()){
+            userRef.set({
+                "visitors": 0,
+                "solvedRiddles": 0
+            })
         }
-        return currentData + 1;
-    });
+        await dataRef.transaction((currentData) => {
+            if (currentData === null) {
+                return 1;
+            }
+            return currentData + 1;
+        });
+    }
 }
 
 async function getUsersData(){
