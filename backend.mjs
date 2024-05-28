@@ -545,14 +545,24 @@ function convertRiddle(riddle) {
 
 function validateRiddle(riddle) {
     let numberOfMaterials = 0;
+    let materials = new Set();
     let is_self_craft = false;
     riddle.recipe.forEach(row => {
         row.forEach(material => {
-            if (material != null) numberOfMaterials++;
+            if (material != null){
+                numberOfMaterials++;
+                if(Array.isArray(material)){
+                    material.forEach(item => {
+                        materials.add(item)
+                    });
+                }else{
+                    materials.add(material)
+                }
+            }
             if (material == riddle.item) is_self_craft |= true;
         });
     });
-    return numberOfMaterials > 1 && !is_self_craft;
+    return numberOfMaterials > 1 && !is_self_craft && materials.size > 1;
 }
 
 server.listen(port, () => {
