@@ -363,7 +363,7 @@ async function createRiddle(socket) {
 
 async function generateHints(riddle) {
     let hints = {};
-    hints["hint1"] = `Number of items: ${gatherCorrectItems(riddle.recipe).essentialItemsNum}}`;
+    hints["hint1"] = `Number of slots to use (max): ${gatherCorrectItems(riddle.recipe).essentialItemsNum}/9`;
     hints["hint2"] = `Number of different materials (min): ${findDifferentMaterials(riddle.recipe)}`;
     hints["hint3"] = `Random material: ${randomizeMaterial(riddle.recipe)}`;
     return hints;
