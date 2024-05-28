@@ -108,35 +108,35 @@ app.get("/recipes", async (req, res) => {
     }
 });
 
-io.on('connection', async(socket) => {
+io.on('connection', async (socket) => {
     socket.on("checkTip", async (data) => {
-        try{
-            if(!riddles[socket.id]["tippedItems"].includes(data.craftedItem)){
+        try {
+            if (!riddles[socket.id]["tippedItems"].includes(data.craftedItem)) {
                 riddles[socket.id]["tips"]++;
                 riddles[socket.id]["tippedItems"].push(data.craftedItem);
                 let result = [];
-                if(riddles[socket.id].riddle.shapeless){
+                if (riddles[socket.id].riddle.shapeless) {
                     result = checkShapelessRecipe(riddles[socket.id].riddle, data);
-                }else{
+                } else {
                     result = createPossibleCombinations(riddles[socket.id].riddle, data);
                 }
                 riddles[socket.id]["tippedRecipes"].push(result.matches);
                 socket.emit("checkTip", {
                     result: {
-                        tippedRecipes: riddles[socket.id]["tippedRecipes"], 
-                        tippedItems: riddles[socket.id]["tippedItems"], 
+                        tippedRecipes: riddles[socket.id]["tippedRecipes"],
+                        tippedItems: riddles[socket.id]["tippedItems"],
                         solved: result.solved
                     },
                     hints: getHints(socket)
                 });
-                if(result.solved){
+                if (result.solved) {
                     riddles[socket.id].streak += 1
                     await updateUsersData("solvedRiddles")
                     io.to("admin").emit("users", await getUsersData())
                 }
-            } catch (e) {
-                socket.emit('error', { error: e.message });
             }
+        } catch (e) {
+            socket.emit('error', { error: e.message });
         };
     });
 
@@ -147,20 +147,20 @@ io.on('connection', async(socket) => {
         } catch (e) {
             socket.emit('error', { error: e.message });
         }
-        if(exist){
+        if (exist) {
             await updateUsersData("visitors")
             io.to("admin").emit("users", await getUsersData())
         }
     })
 
-    socket.on("login", async() => {
+    socket.on("login", async () => {
         socket.join("admin")
         socket.emit("users", await getUsersData())
     })
 
     socket.on("disconnect", async () => {
         let streak = riddles[socket.id]?.streak
-        if(streak > 0){
+        if (streak > 0) {
             await addStreak(streak)
             io.to("admin").emit("users", await getUsersData())
         }
@@ -169,7 +169,7 @@ io.on('connection', async(socket) => {
 });
 
 async function addStreak(streak) {
-    if(port != 6969){
+    if (port != 6969) {
         const db = usersDbAdmin.database();
         const ref = db.ref(`/streakPerPlayers`);
         await ref.transaction(currentData => {
@@ -184,12 +184,12 @@ async function addStreak(streak) {
 }
 
 async function updateUsersData(path) {
-    if(port != 6969){
+    if (port != 6969) {
         const db = usersDbAdmin.database();
         const userRef = db.ref(`/date/${getTodayDate()}/`);
         const snapshot = await userRef.once('value');
         const dataRef = userRef.child(path);
-        if(!snapshot.exists()){
+        if (!snapshot.exists()) {
             userRef.set({
                 "visitors": 0,
                 "solvedRiddles": 0
@@ -204,7 +204,7 @@ async function updateUsersData(path) {
     }
 }
 
-async function getUsersData(){
+async function getUsersData() {
     let data = await getData(usersDbAdmin)
     data["currentPlayers"] = Object.keys(riddles).length
     data["todayDate"] = getTodayDate()
@@ -219,7 +219,7 @@ function getTodayDate() {
     return `${year}-${month}-${day}`;
 }
 
-function getHints(socket){
+function getHints(socket) {
     let hints = {
         tips: riddles[socket.id].tips,
         hint1: null,
@@ -430,7 +430,7 @@ async function createRiddle(socket) {
         do {
             riddle = recipes[Math.floor(Math.random() * recipes.length)];
         } while (!validateRiddle(riddle));
-        if(riddles[socket.id] == undefined){
+        if (riddles[socket.id] == undefined) {
             riddles[socket.id] = {}
         }
         riddles[socket.id]["riddle"] = riddle
@@ -438,7 +438,7 @@ async function createRiddle(socket) {
         riddles[socket.id]["tippedItems"] = []
         riddles[socket.id]["hints"] = await generateHints(riddle)
         riddles[socket.id]["tippedRecipes"] = [];
-        if(riddles[socket.id]["streak"] == undefined){
+        if (riddles[socket.id]["streak"] == undefined) {
             riddles[socket.id]["streak"] = 0;
         }
         console.log(riddles)
