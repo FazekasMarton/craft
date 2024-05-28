@@ -8,22 +8,32 @@ import { Server } from 'socket.io';
 import admin from "firebase-admin"
 import dotenv from "dotenv"
 
-//***************************************DEFINING SERVER *************************************************/
-
 dotenv.config()
 
 const recipesDbServiceAccount = JSON.parse(process.env.RecipesKey)
 const itemsDbServiceAccount = JSON.parse(process.env.ItemsKey)
+let recipesDbAdmin;
+let itemsDbAdmin;
 
-const recipesDbAdmin = admin.initializeApp({
-    credential: admin.credential.cert(recipesDbServiceAccount),
-    databaseURL: "https://craftdle---recipes-f8dd6-default-rtdb.europe-west1.firebasedatabase.app"
-}, "recipes");
+try {
+    recipesDbAdmin = admin.initializeApp({
+        credential: admin.credential.cert(recipesDbServiceAccount),
+        databaseURL: "https://craftdle---recipes-f8dd6-default-rtdb.europe-west1.firebasedatabase.app"
+    }, "recipes");
+} catch (e) {
+    console.error('Failed to initialize recipesDbAdmin:', e.message);
+    recipesDbAdmin = null;
+}
 
-const itemsDbAdmin = admin.initializeApp({
-    credential: admin.credential.cert(itemsDbServiceAccount),
-    databaseURL: "https://craftdle-4ce47-default-rtdb.europe-west1.firebasedatabase.app"
-}, "items");
+try {
+    itemsDbAdmin = admin.initializeApp({
+        credential: admin.credential.cert(itemsDbServiceAccount),
+        databaseURL: "https://craftdle-4ce47-default-rtdb.europe-west1.firebasedatabase.app"
+    }, "items");
+} catch (e) {
+    console.error('Failed to initialize itemsDbAdmin:', e.message);
+    itemsDbAdmin = null;
+}
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -50,98 +60,125 @@ const io = new Server(server, {
     }
 });
 
-let items = null
-let recipes = null
-let riddles = {}
+let items = null;
+let recipes = null;
+let riddles = {};
 
-app.get("/items", async(req, res) => {
-    if(items == null){
-        items = await getData(itemsDbAdmin)
+app.get("/items", async (req, res) => {
+    try {
+        if (itemsDbAdmin == null) {
+            throw new Error('Firebase not initialized for items database');
+        } else if (items == null) {
+            items = await getData(itemsDbAdmin);
+        }
+        res.send(items);
+    } catch (e) {
+        console.error(e.message);
+        res.status(500).send({ error: e.message });
     }
-    res.send(items)
-})
+});
 
-app.get("/recipes", async(req, res) => {
-    if(recipes == null){
-        await convertRecipes()
+app.get("/recipes", async (req, res) => {
+    try {
+        if (recipesDbAdmin == null) {
+            throw new Error('Firebase not initialized for recipes database');
+        } else if (recipes == null) {
+            await convertRecipes();
+        }
+        res.send({ data: recipes });
+    } catch (e) {
+        console.error(e.message);
+        res.status(500).send({ error: e.message });
     }
-    res.send({data: recipes})
-})
+});
 
-io.on('connection', async(socket) => {
-    await createRiddle(socket)
+io.on('connection', async (socket) => {
+    try {
+        await createRiddle(socket);
+    } catch (e) {
+        socket.emit('error', { error: e.message });
+    }
 
     socket.on("checkTip", (data) => {
-        if(!riddles[socket.id]["tippedItems"].includes(data.craftedItem)){
-            riddles[socket.id]["tips"]++;
-            riddles[socket.id]["tippedItems"].push(data.craftedItem);
-            let result = [];
-            if(riddles[socket.id].riddle.shapeless){
-                result = checkShapelessRecipe(riddles[socket.id].riddle, data);
-            }else{
-                result = createPossibleCombinations(riddles[socket.id].riddle, data);
+        try {
+            if (!riddles[socket.id]["tippedItems"].includes(data.craftedItem)) {
+                riddles[socket.id]["tips"]++;
+                riddles[socket.id]["tippedItems"].push(data.craftedItem);
+                let result = [];
+                if (riddles[socket.id].riddle.shapeless) {
+                    result = checkShapelessRecipe(riddles[socket.id].riddle, data);
+                } else {
+                    result = createPossibleCombinations(riddles[socket.id].riddle, data);
+                }
+                riddles[socket.id]["tippedRecipes"].push(result.matches);
+                socket.emit("checkTip", {
+                    result: {
+                        tippedRecipes: riddles[socket.id]["tippedRecipes"],
+                        tippedItems: riddles[socket.id]["tippedItems"],
+                        solved: result.solved
+                    },
+                    hints: getHints(socket)
+                });
             }
-            riddles[socket.id]["tippedRecipes"].push(result.matches);
-            socket.emit("checkTip", {
-                result: {
-                    tippedRecipes: riddles[socket.id]["tippedRecipes"], 
-                    tippedItems: riddles[socket.id]["tippedItems"], 
-                    solved: result.solved
-                },
-                hints: getHints(socket)
-            });
-        };
+        } catch (e) {
+            socket.emit('error', { error: e.message });
+        }
     });
 
     socket.on("newRiddle", () => {
-        createRiddle(socket)
-    })
+        try {
+            createRiddle(socket);
+        } catch (e) {
+            socket.emit('error', { error: e.message });
+        }
+    });
 
     socket.on("disconnect", () => {
-        delete riddles[socket.id]
-    })
+        delete riddles[socket.id];
+    });
 });
 
-function getHints(socket){
+function getHints(socket) {
     let hints = {
         tips: riddles[socket.id].tips,
         hint1: null,
         hint2: null,
         hint3: null
     }
-    let hints_template = riddles[socket.id].hints
-    if(hints.tips >= 5){
-        hints.hint1 = hints_template.hint1
-        if(hints.tips >= 10){
-            hints.hint2 = hints_template.hint2
-            if(hints.tips >= 15){
-                hints.hint3 = hints_template.hint3
+    let hints_template = riddles[socket.id].hints;
+    if (hints.tips >= 5) {
+        hints.hint1 = hints_template.hint1;
+        if (hints.tips >= 10) {
+            hints.hint2 = hints_template.hint2;
+            if (hints.tips >= 15) {
+                hints.hint3 = hints_template.hint3;
             }
         }
     }
-    return hints
+    return hints;
 }
 
-function createPossibleCombinations(riddle, data){
+function createPossibleCombinations(riddle, data) {
     let matrices = generateMatrices(riddle.recipe);
     let tip = restoreMatrix(data.originalRecipe);
     let result = compareMatrices(matrices, tip);
     return markMatches(result, tip, riddle);
 }
 
-function markMatches(result, tip, riddle){
-    let data = gatherCorrectItems(riddle.recipe)
-    let materials = data.items;
-    let solved = result.matches == data.essentialItems.length && result.matches == gatherCorrectItems(tip).essentialItems.length;
+function markMatches(result, tip, riddle) {
+    let data = gatherCorrectItems(riddle.recipe);
+    let materials = data.shapedItems.slice();
+    let solved = result.matches === data.essentialItemsNum && result.matches === gatherCorrectItems(tip).essentialItemsNum;
     let matches = [];
+
     for (let i = 0; i < result.matchingMatrix.length; i++) {
         for (let j = 0; j < result.matchingMatrix[i].length; j++) {
             let obj = {};
             if (tip[i][j] != null) {
                 let key = tip[i][j];
-                if ((Array.isArray(result.matchingMatrix[i][j]) && result.matchingMatrix[i][j].includes(key)) || result.matchingMatrix[i][j] == key) {
+                if ((Array.isArray(result.matchingMatrix[i][j]) && result.matchingMatrix[i][j].includes(key)) || result.matchingMatrix[i][j] === key) {
                     obj[key] = "correct";
-                    materials = removeFromMaterials(materials, key);
+                    removeFromMaterials(key);
                 } else {
                     obj[key] = "waiting";
                 }
@@ -151,276 +188,285 @@ function markMatches(result, tip, riddle){
             matches.push(obj);
         }
     }
+
+    function removeFromMaterials(item) {
+        for (let i = 0; i < materials.length; i++) {
+            if ((Array.isArray(materials[i]) && materials[i].includes(item)) || materials[i] === item) {
+                materials.splice(i, 1);
+                break;
+            }
+        }
+    }
+
     matches.forEach(match => {
         let key = Object.keys(match)[0];
-        if (match[key] == "waiting") { 
-            if (materials.includes(key)) { 
+        if (match[key] === "waiting") {
+            let foundIndex = materials.findIndex(mat => (Array.isArray(mat) && mat.includes(key)) || mat === key);
+            if (foundIndex !== -1) {
                 match[key] = "semi-correct";
-                materials = removeFromMaterials(materials, key);
+                materials.splice(foundIndex, 1);
             } else {
                 match[key] = "wrong";
             }
         }
     });
-    return {matches: matches, solved: solved};
-};
 
-function compareMatrices(matrices, tip){
+    return { matches: matches, solved: solved };
+}
+
+function compareMatrices(matrices, tip) {
     let mostMatches = -1;
     let matchingMatrix = [];
-    matrices.forEach(mat =>{
+    matrices.forEach(mat => {
         let matches = 0;
-        for(let i = 0; i < mat.length; i ++){
-            for(let j = 0; j < mat[i].length; j++){
-                if(mat[i][j] != null){
-                    if(Array.isArray(mat[i][j]) && mat[i][j].includes(tip[i][j])){
+        for (let i = 0; i < mat.length; i++) {
+            for (let j = 0; j < mat[i].length; j++) {
+                if (mat[i][j] != null) {
+                    if (Array.isArray(mat[i][j]) && mat[i][j].includes(tip[i][j])) {
                         matches++;
-                    } else if(mat[i][j] == tip[i][j]){
+                    } else if (mat[i][j] === tip[i][j]) {
                         matches++;
-                    };
-                };
-            };
-        };
-        if(matches > mostMatches){
+                    }
+                }
+            }
+        }
+        if (matches > mostMatches) {
             mostMatches = matches;
             matchingMatrix = mat;
-        };
+        }
     });
-    return {matches: mostMatches, matchingMatrix: matchingMatrix};
-};
+    return { matches: mostMatches, matchingMatrix: matchingMatrix };
+}
 
-function restoreMatrix(data){
+function restoreMatrix(data) {
     let matrix = [];
-    for(let i = 0; i < data.length; i += 3){
-        matrix.push([data[i], data[i+1], data[i+2]]);
+    for (let i = 0; i < data.length; i += 3) {
+        matrix.push(data.slice(i, i + 3));
     }
     return matrix;
 }
 
-function generateMatrices(inputMatrix) {
-    let results = [];
-    let maxRows = 3 - inputMatrix.length + 1;
-    let maxCols = 3 - Math.max(...inputMatrix.map(row => row.length)) + 1;
-    for (let i = 0; i < maxRows; i++) {
-        for (let j = 0; j < maxCols; j++) {
-            results.push(fillMatrix(inputMatrix, i, j));
-        }
-    }
-    return results;
-}
-
-function fillMatrix(matrix, startRow, startCol) {
-    let filledMatrix = Array(3).fill(null).map(() => Array(3).fill(null));
-    for (let i = 0; i < matrix.length; i++) {
-        for (let j = 0; j < matrix[i].length; j++) {
-        filledMatrix[startRow + i][startCol + j] = matrix[i][j] || null;
-        }
-    }
-    return filledMatrix;
-}
-
-function removeFromMaterials(data, item){
-    let array = data;
-    for(let i = 0; i < array.length; i++) {
-        if(Array.isArray(data[i])){
-            if(data[i].includes(item)){
-                array.splice(i,1);
-                break;
+function generateMatrices(recipe) {
+    let matrices = [];
+    for (let i = 0; i <= 3 - recipe.length; i++) {
+        for (let j = 0; j <= 3 - recipe[0].length; j++) {
+            let matrix = [[], [], []];
+            for (let k = 0; k < i; k++) matrix[k] = [null, null, null];
+            for (let k = 0; k < recipe.length; k++) {
+                for (let l = 0; l < j; l++) matrix[i + k].push(null);
+                for (let l = 0; l < recipe[0].length; l++) {
+                    matrix[i + k].push(recipe[k][l]);
+                }
+                for (let l = 0; l < 3 - j - recipe[0].length; l++) matrix[i + k].push(null);
             }
-        }else if(data[i] == item){
-            array.splice(i,1);
-            break;
+            for (let k = 0; k < 3 - i - recipe.length; k++) matrix[i + recipe.length + k] = [null, null, null];
+            matrices.push(matrix);
         }
     }
-    return array;
+    return matrices;
 }
 
-function checkShapelessRecipe(riddle, data){
+function checkShapelessRecipe(riddle, data) {
     let result = [];
     let matches = 0;
     let mats = gatherCorrectItems(riddle.recipe);
     let wrongMat = false;
-    let correctMaterials = mats.items
+    let correctMaterials = mats.shapelessItems;
     data.originalRecipe.forEach(item => {
         let obj = {};
-            let key = item;
-            if(item == null){
-                obj[key] = null
-            } else if(correctMaterials.includes(item)){
-                obj[key] = "correct";
-                matches++;
-            } else{
-                obj[key] = "wrong";
-                wrongMat = true;
-            }
-            result.push(obj);
+        let key = item;
+        if (item == null) {
+            obj[key] = null;
+        } else if (correctMaterials.includes(item)) {
+            obj[key] = "correct";
+            matches++;
+        } else {
+            obj[key] = "wrong";
+            wrongMat = true;
+        }
+        result.push(obj);
     });
-    let solved = matches == mats.essentialItems.length && !wrongMat;
-    return {matches: result, solved: solved};
+    let solved = matches === mats.essentialItemsNum && !wrongMat;
+    return { matches: result, solved: solved };
 }
 
-function gatherCorrectItems(recipe){
-    let items = [];
-    let essentialItems = []
+function gatherCorrectItems(recipe) {
+    let shapelessItems = [];
+    let shapedItems = [];
+    let essentialItemsNum = 0;
     recipe.forEach(row => {
         row.forEach(cell => {
-            if(Array.isArray(cell)){
-                if(!cell.includes(null)){
-                    essentialItems.push(cell[0]);
+            if (Array.isArray(cell)) {
+                if (!cell.includes(null)) {
+                    essentialItemsNum++;
                 }
                 cell.forEach(item => {
-                    if(item != null){
-                        items.push(item);
-                    };
+                    if (item != null) {
+                        shapelessItems.push(item);
+                    }
                 });
-            }else if(cell != null){
-                items.push(cell);
-                essentialItems.push(cell);
-            };
-        });
-    });
-    return {items: items, essentialItems: essentialItems};
-};
-
-async function getData(admin) {
-    const db = admin.database();
-    const ref = db.ref('/');
-    const snapshot = await ref.once('value');
-    const data = snapshot.val();
-    return data
-}
-
-async function convertRecipes(){
-    recipes = await getData(recipesDbAdmin);
-    recipes = recipes.data
-    recipes.forEach(recipe => {
-        recipe = convertRiddle(recipe)
-    });
-}
-
-async function createRiddle(socket){
-    if(recipes == null){
-        await convertRecipes()
-    }
-    let riddle
-    do {
-        riddle = recipes[Math.floor(Math.random() * recipes.length)];
-    } while (!validateRiddle(riddle));
-    riddles[socket.id] = {}
-    riddles[socket.id]["riddle"] = riddle
-    riddles[socket.id]["tips"] = 0
-    riddles[socket.id]["tippedItems"] = []
-    riddles[socket.id]["hints"] = await generateHints(riddle)
-    riddles[socket.id]["tippedRecipes"] = [];
-    console.log(riddles)
-}
-
-async function generateHints(riddle){
-    let hints = {}
-    hints["hint1"] = `Stack size: ${await getStackSize(riddle.item)}\nQuantity: ${riddle.quantity}`
-    hints["hint2"] = `Number of different materials (min): ${findDifferentMaterials(riddle.recipe)}`
-    hints["hint3"] = `Random material: ${randomizeMaterial(riddle.recipe)}`
-    return hints
-}
-
-function findDifferentMaterials(recipe){
-    let materials = new Set()
-    recipe.forEach(row => {
-        row.forEach(material => {
-            if(!(Array.isArray(material) && material.includes(null) || material == null)){
-                if(Array.isArray(material)) material = material.join(", ")
-                materials.add(material)
+                shapedItems.push(cell);
+            } else if (cell != null) {
+                shapelessItems.push(cell);
+                essentialItemsNum++;
+                shapedItems.push(cell);
             }
         });
     });
-    return materials.size
+    return { essentialItemsNum: essentialItemsNum, shapelessItems: shapelessItems, shapedItems: shapedItems };
 }
 
-function randomizeMaterial(materials){
-    materials = materials.flat(Infinity)
-    let material = null
-    while(material == null){
-        material = materials[Math.floor(Math.random() * materials.length)]
+async function getData(admin) {
+    try {
+        const db = admin.database();
+        const ref = db.ref('/');
+        const snapshot = await ref.once('value');
+        const data = snapshot.val();
+        return data;
+    } catch (e) {
+        throw new Error('Failed to fetch data from Firebase.');
     }
-    return material
 }
 
-async function getStackSize(item_name){
-    if(items == null){
-        items = await getData(itemsDbAdmin)
+async function convertRecipes() {
+    try {
+        recipes = await getData(recipesDbAdmin);
+        recipes = recipes.data;
+        recipes.forEach(recipe => {
+            convertRiddle(recipe);
+        });
+    } catch (e) {
+        throw new Error('Failed to convert recipes.');
     }
-    let stack_size = undefined
-    items.data.forEach(item => {
-        if(item.name == item_name) stack_size = item.stackSize
+}
+
+async function createRiddle(socket) {
+    try {
+        if (recipes == null) {
+            await convertRecipes();
+        }
+        let riddle;
+        do {
+            riddle = recipes[Math.floor(Math.random() * recipes.length)];
+        } while (!validateRiddle(riddle));
+        riddles[socket.id] = {};
+        riddles[socket.id]["riddle"] = riddle;
+        riddles[socket.id]["tips"] = 0;
+        riddles[socket.id]["tippedItems"] = [];
+        riddles[socket.id]["hints"] = await generateHints(riddle);
+        riddles[socket.id]["tippedRecipes"] = [];
+        console.log(riddles);
+    } catch (e) {
+        throw new Error('Failed to create a riddle.');
+    }
+}
+
+async function generateHints(riddle) {
+    let hints = {};
+    hints["hint1"] = `Number of items: ${gatherCorrectItems(riddle.recipe).essentialItemsNum}}`;
+    hints["hint2"] = `Number of different materials (min): ${findDifferentMaterials(riddle.recipe)}`;
+    hints["hint3"] = `Random material: ${randomizeMaterial(riddle.recipe)}`;
+    return hints;
+}
+
+function findDifferentMaterials(recipe) {
+    let materials = new Set();
+    recipe.forEach(row => {
+        row.forEach(material => {
+            if (!(Array.isArray(material) && material.includes(null) || material == null)) {
+                if (Array.isArray(material)) material = material.join(", ");
+                materials.add(material);
+            }
+        });
     });
-    return stack_size
+    return materials.size;
 }
 
-function convertRiddle(riddle){
-    let craft_matrix = [[],[],[]]
-    let recipe = []
-    let col = 0
-    let row = 0
+function randomizeMaterial(materials) {
+    materials = materials.flat(Infinity);
+    let material = null;
+    while (material == null) {
+        material = materials[Math.floor(Math.random() * materials.length)];
+    }
+    return material;
+}
+
+async function getStackSize(item_name) {
+    if (items == null) {
+        items = await getData(itemsDbAdmin);
+    }
+    let stack_size = undefined;
+    items.data.forEach(item => {
+        if (item.name == item_name) stack_size = item.stackSize;
+    });
+    return stack_size;
+}
+
+function convertRiddle(riddle) {
+    let craft_matrix = [[], [], []];
+    let recipe = [];
+    let col = 0;
+    let row = 0;
 
     for (let i = 0; i < 9; i++) {
         let material = riddle.recipe[i];
-        if(material == null || material == undefined){
-            recipe.push(null)
-        }else{
-            recipe.push(material)
+        if (material == null || material == undefined) {
+            recipe.push(null);
+        } else {
+            recipe.push(material);
         }
     }
 
     recipe.forEach(material => {
-        craft_matrix[row].push(material)
-        col++
-        if(col == 3){
-            col = 0
-            row++
+        craft_matrix[row].push(material);
+        col++;
+        if (col == 3) {
+            col = 0;
+            row++;
         }
     });
     for (let a = 0; a < 2; a++) {
         for (let i = 0; i < craft_matrix.length; i++) {
-            let is_all_null = true
+            let is_all_null = true;
             if (i != 1 || craft_matrix.length < 3) {
                 craft_matrix[i].forEach(material => {
-                    if(material != null) is_all_null &= false
+                    if (material != null) is_all_null &= false;
                 });
-                if(is_all_null){
-                    craft_matrix.splice(i, 1)
-                    i--
+                if (is_all_null) {
+                    craft_matrix.splice(i, 1);
+                    i--;
                 }
             }
         }
         for (let i = 0; i < craft_matrix[0].length; i++) {
-            let is_all_null = true
+            let is_all_null = true;
             if (i != 1 || craft_matrix[0].length < 3) {
                 for (let j = 0; j < craft_matrix.length; j++) {
-                    if(craft_matrix[j][i] != null) is_all_null &= false
+                    if (craft_matrix[j][i] != null) is_all_null &= false;
                 }
-                if(is_all_null){
+                if (is_all_null) {
                     for (let j = 0; j < craft_matrix.length; j++) {
-                        craft_matrix[j].splice(i, 1)
+                        craft_matrix[j].splice(i, 1);
                     }
-                    i--
+                    i--;
                 }
             }
         }
     }
-    riddle.recipe = craft_matrix
-    return riddle
+    riddle.recipe = craft_matrix;
+    return riddle;
 }
 
-function validateRiddle(riddle){
-    let numberOfMaterials = 0
-    let is_self_craft = false
+function validateRiddle(riddle) {
+    let numberOfMaterials = 0;
+    let is_self_craft = false;
     riddle.recipe.forEach(row => {
         row.forEach(material => {
-            if(material != null) numberOfMaterials++
-            if(material == riddle.item) is_self_craft |= true
+            if (material != null) numberOfMaterials++;
+            if (material == riddle.item) is_self_craft |= true;
         });
     });
-    return numberOfMaterials > 1 && !is_self_craft
+    return numberOfMaterials > 1 && !is_self_craft;
 }
 
 server.listen(port, () => {
