@@ -3,6 +3,7 @@ const socket = io(url)
 socket.emit("login")
 
 let users_per_day_chart = createUsersPerDayChart()
+let update_date = null
 
 function getBackendURL() {
     let url = "http://localhost:6969"
@@ -22,7 +23,10 @@ function displayData(data){
     document.getElementById("todaysPlayers").innerText = `Today's Visitors: ${data.date[today].visitors}`
     document.getElementById("todaysSolvedRiddles").innerText = `Riddles Solved Today: ${data.date[today].solvedRiddles}`
     document.getElementById("streakPerPlayers").innerText = `Average Game Played In A Row: ${avg(data.streakPerPlayers)}`
-    updateUsersPerDayChart(data.date, today)
+    if(update_date != today){
+      update_date = today
+      updateUsersPerDayChart(data.date, today)
+    }
 }
 
 function avg(list){
