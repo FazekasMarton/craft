@@ -22,7 +22,7 @@ function Achievement(props: achievementProps) {
                 clickAudio.play()
                 setTimeout(() => {
                     (document.getElementById("search") as HTMLInputElement).value = ""
-                    restart(props.setSearch, props.setDropItem, props.setCraftingTableSlots, props.setCraftedItem, props.setCraftedItemsRecipe, props.setHints, props.setUsedHints, props.setResult)
+                    restart(props.setSearch, props.setDropItem, props.setCraftingTableSlots, props.setCraftedItem, props.setCraftedItemsRecipe, props.setHints, props.setUsedHints, props.setResult, props.setError)
                     props.socket.emit("newRiddle")
                     achievementAudio = new Audio(achievementSound)
                 }, clickAudio.duration * 1000);

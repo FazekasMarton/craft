@@ -9,7 +9,9 @@ function Error(props: errorProps) {
                     <h1 id='errorCode'>{props.error.code}</h1>
                     <h2 id='errorTitle'>{props.error.title}</h2>
                     <p id='errorText'>{props.error.message}</p>
-                    <button id='errorButton' onClick={() => { location.reload() }}>Try again</button>
+                    <button id='errorButton' onClick={() => {
+                        props.setError(null)
+                    }}>Try again</button>
                 </div>
             </div>
     }

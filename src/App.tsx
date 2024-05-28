@@ -18,7 +18,7 @@ const dropAudio = new Audio(dropSound)
 dropAudio.preload = "auto"
 
 const url: string = getBackendURL()
-const socket = io(url)
+let socket = io(url)
 
 function clearInputs(craftingTableSlots: Array<HTMLImageElement | null>, setCraftingTableSlots: (value: Array<HTMLImageElement | null>) => void) {
   dropAudio.play()
@@ -99,17 +99,23 @@ function App() {
     checkPC(setPC)
   })
 
-  if (!socket.connected && items.length > 0 && recipes.length > 0 && error == null && timeOut == null) {
-    setTimeOut(
-      setTimeout(() => {
-        setError(errorExample)
-      }, 5000)
-    )
-  } else if (socket.connected && error != null) {
-    restart(setSearch, setDropItem, setCraftingTableSlots, setCraftedItem, setCraftedItemsRecipe, setHints, setUsedHints, setResult)
-  } else {
-    if (timeOut != null) clearTimeout(timeOut)
-  }
+  useEffect(() => {
+    if (!socket.connected || items.length === 0 || recipes.length === 0) {
+      if (error == null && timeOut == null) {
+        const timeout = setTimeout(() => {
+          setError(errorExample);
+        }, 5000);
+        setTimeOut(timeout);
+      }
+    } else if (!socket.connected) {
+      socket = io(url);
+    } else if (socket.connected) {
+      restart(setSearch, setDropItem, setCraftingTableSlots, setCraftedItem, setCraftedItemsRecipe, setHints, setUsedHints, setResult, setError);
+    } else if (timeOut != null) {
+      clearTimeout(timeOut);
+      setTimeOut(null);
+    }
+  }, [socket, items, recipes, error, timeOut]);
 
   useEffect(() => {
     socket.on("checkTip", async (data) => {
@@ -161,8 +167,8 @@ function App() {
       <CraftingTable craftingTableSize={craftingTableSize} dropItem={dropItem} setDropItem={setDropItem} result={result} pc={pc} slots={craftingTableSlots} setSlots={setCraftingTableSlots} craftedItem={craftedItem} />
       <Tips hints={hints} craftingTableSize={craftingTableSize} result={result} items={items} usedHints={usedHints} setUsedHints={setUsedHints} />
       <Items dropItem={dropItem} recipes={recipes} items={items} setSearch={setSearch} search={search} setDropItem={setDropItem} pc={pc} socket={socket} slots={craftingTableSlots} setSlots={setCraftingTableSlots} />
-      <Achievement result={result} items={items} setResult={setResult} setSearch={setSearch} setDropItem={setDropItem} setCraftingTableSlots={setCraftingTableSlots} setCraftedItem={setCraftedItem} setCraftedItemsRecipe={setCraftedItemsRecipe} setHints={setHints} setUsedHints={setUsedHints} socket={socket}/>
-      <Error error={error} />
+      <Achievement result={result} items={items} setResult={setResult} setSearch={setSearch} setDropItem={setDropItem} setCraftingTableSlots={setCraftingTableSlots} setCraftedItem={setCraftedItem} setCraftedItemsRecipe={setCraftedItemsRecipe} setHints={setHints} setUsedHints={setUsedHints} socket={socket} setError={setError}/>
+      <Error error={error} setError={setError}/>
     </>
   )
 }
