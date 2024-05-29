@@ -1,0 +1,64 @@
+{
+    "data": [
+        {
+            "name": "Example",
+            "id": "Example_1",
+            "recipe": [
+                null, null, null,
+                null, null, null,
+                null, null, null
+            ],
+            "shapless": false
+        },
+        {
+            "name": "Leather Tunic",
+            "id": "leather_tunic_1",
+            "recipe": [
+                "Leather", null, "Leather",
+                "Leather", "Leather", "Leather",
+                "Leather", "Leather", "Leather"
+            ],
+            "shapless": false
+        },
+        {
+            "name": "Leather Cap",
+            "id": "leather_cap_1",
+            "recipe": [
+                "Leather", "Leather", "Leather",
+                "Leather", null, "Leather",
+                null, null, null
+            ],
+            "shapless": false
+        },
+        {
+            "name": "Diamond Pickaxe",
+            "id": "diamond_pickaxe_1",
+            "recipe": [
+                "Diamond", "Diamond", "Diamond",
+                null, "Stick", null,
+                null, "Stick", null
+            ],
+            "shapless": false
+        },
+        {
+            "name": "Recovery Compass",
+            "id": "recovery_compass_1",
+            "recipe": [
+                "Echo Shard", "Echo Shard", "Echo Shard",
+                "Echo Shard", "Compass", "Echo Shard",
+                "Echo Shard", "Echo Shard", "Echo Shard"
+            ],
+            "shapless": false
+        },
+        {
+            "name": "Iron Sword",
+            "id": "iron_sword_1",
+            "recipe": [
+                null, "Iron Ingot", null,
+                null, "Iron Ingot", null,
+                null, "Stick", null
+            ],
+            "shapless": false
+        }
+    ]
+}

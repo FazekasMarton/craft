@@ -108,6 +108,19 @@ app.get("/recipes", async (req, res) => {
     }
 });
 
+app.get('/minecraft-images/:imageName', (req, res) => {
+    const imageName = req.params.imageName;
+    const imagePath = path.join(__dirname, 'public/minecraft-images', imageName);
+
+    console.log(imagePath)
+
+    res.sendFile(imagePath, (err) => {
+        if (err) {
+            res.status(404).send('Image not found');
+        }
+    });
+});
+
 io.on('connection', async (socket) => {
     socket.on("checkTip", async (data) => {
         try {
@@ -549,13 +562,13 @@ function validateRiddle(riddle) {
     let is_self_craft = false;
     riddle.recipe.forEach(row => {
         row.forEach(material => {
-            if (material != null){
+            if (material != null) {
                 numberOfMaterials++;
-                if(Array.isArray(material)){
+                if (Array.isArray(material)) {
                     material.forEach(item => {
                         materials.add(item)
                     });
-                }else{
+                } else {
                     materials.add(material)
                 }
             }
