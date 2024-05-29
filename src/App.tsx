@@ -12,7 +12,7 @@ import { Error } from './components/Error.tsx';
 import io from 'socket.io-client';
 import dropSound from "./assets/audio/drop.mp3"
 import { craft } from './functions/craft.tsx';
-import { restart } from './functions/restart.tsx';
+//import { restart } from './functions/restart.tsx';
 
 const dropAudio = new Audio(dropSound)
 dropAudio.preload = "auto"
@@ -62,7 +62,7 @@ function checkPC(setPC: (value: boolean) => void) {
 }
 
 function App() {
-  const [timeOut, setTimeOut] = useState<null | ReturnType<typeof setTimeout>>(null);
+  //const [timeOut, setTimeOut] = useState<null | ReturnType<typeof setTimeout>>(null);
   const [error, setError] = useState<error | null>(null);
   const [recipesCount, setRecipesCount] = useState(0);
   const [itemsCount, setItemsCount] = useState(0);
@@ -99,7 +99,7 @@ function App() {
     checkPC(setPC)
   })
 
-  useEffect(() => {
+/*   useEffect(() => {
     if (!socket.connected || items.length === 0 || recipes.length === 0) {
       if (error == null && timeOut == null) {
         const timeout = setTimeout(() => {
@@ -115,7 +115,7 @@ function App() {
       clearTimeout(timeOut);
       setTimeOut(null);
     }
-  }, [socket, items, recipes, error, timeOut]);
+  }, [socket, items, recipes, error, timeOut]); */
 
   useEffect(() => {
     socket.on("checkTip", async (data) => {
