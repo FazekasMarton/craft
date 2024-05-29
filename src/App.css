@@ -376,6 +376,16 @@ table .correct {
   border-left: 2px solid rgb(66, 115, 52);
 }
 
+#errorBorder{
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.575);
+}
+
 #error {
   position: absolute;
   top: 50%;

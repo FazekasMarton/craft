@@ -104,7 +104,7 @@ function App() {
       if (error == null && timeOut == null) {
         const timeout = setTimeout(() => {
           setError(errorExample);
-        }, 5000);
+        }, 10000);
         setTimeOut(timeout);
       }
     } else if (!socket.connected) {
