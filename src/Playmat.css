@@ -36,7 +36,7 @@ body,
     "tips items";
 }
 
-#playmatWrapper img:not(#searchIcon, #backToMenu) {
+#playmatWrapper img:not(#searchIcon, #backToMenu, .craftingArrow) {
   height: 90%;
   max-height: 58px;
 }
@@ -99,6 +99,7 @@ body,
 }
 
 .tipCrafting {
+  padding: 10px;
   grid-template-areas:
     "craft arrow item";
 }
@@ -326,7 +327,7 @@ table .correct {
 }
 
 .craftingArrow {
-  height: 7vmin;
+  height: 6vmin;
 }
 
 #achievement {
