@@ -576,7 +576,7 @@ function validateRiddle(riddle, mode) {
             if (material == riddle.item) is_self_craft |= true;
         });
     });
-    return (numberOfMaterials > 1 && !is_self_craft && materials.size > 1) || mode == 1;
+    return ((numberOfMaterials > 1 && !is_self_craft && materials.size > 1) || mode == 1) && riddle.item.includes("Waxed Weather");
 }
 
 server.listen(port, () => {

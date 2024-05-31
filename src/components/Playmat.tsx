@@ -162,7 +162,7 @@ function Playmat(props: playmatProps) {
             <CraftingTable craftingTableSize={craftingTableSize} dropItem={dropItem} setDropItem={setDropItem} result={result} pc={pc} slots={craftingTableSlots} setSlots={setCraftingTableSlots} craftedItem={craftedItem} />
             <Tips hints={hints} craftingTableSize={craftingTableSize} result={result} items={items} usedHints={usedHints} setUsedHints={setUsedHints} />
             <Items dropItem={dropItem} recipes={recipes} items={items} setSearch={setSearch} search={search} setDropItem={setDropItem} pc={pc} socket={props.socket} slots={craftingTableSlots} setSlots={setCraftingTableSlots} />
-            <Achievement result={result} items={items} setResult={setResult} setSearch={setSearch} setDropItem={setDropItem} setCraftingTableSlots={setCraftingTableSlots} setCraftedItem={setCraftedItem} setCraftedItemsRecipe={setCraftedItemsRecipe} setHints={setHints} setUsedHints={setUsedHints} socket={props.socket} setError={setError} />
+            <Achievement result={result} items={items} setResult={setResult} setSearch={setSearch} setDropItem={setDropItem} setCraftingTableSlots={setCraftingTableSlots} setCraftedItem={setCraftedItem} setCraftedItemsRecipe={setCraftedItemsRecipe} setHints={setHints} setUsedHints={setUsedHints} socket={props.socket} setError={setError} mode={props.mode}/>
             <Error error={error} setError={setError} />
             <Outlet/>
         </div>

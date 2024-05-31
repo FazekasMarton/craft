@@ -17,7 +17,8 @@ interface achievementProps {
     setUsedHints: (value: Array<boolean>) => void, 
     setResult: (value: tips | undefined) => void,
     socket: Socket,
-    setError: (value: error | null) => void;
+    setError: (value: error | null) => void,
+    mode: number
 }
 
 export type { achievementProps }
