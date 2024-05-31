@@ -1,0 +1,548 @@
+@font-face {
+  font-family: MinecraftRegular;
+  src: url("./assets/minecraft-font/MinecraftRegular-Bmg3.otf");
+}
+
+@font-face {
+  font-family: MinecraftItalic;
+  src: url("./assets/minecraft-font/MinecraftItalic-R8Mo.otf");
+}
+
+* {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+html,
+body,
+#playmatWrapper {
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  font-family: MinecraftRegular;
+  color: rgb(85, 85, 84);
+  background-color: rgb(194, 195, 195);
+}
+
+#playmatWrapper {
+  display: grid;
+  grid-template-columns: min-content auto;
+  grid-template-rows: min-content 1fr;
+  grid-template-areas:
+    "back items"
+    "craftingTable items"
+    "tips items";
+}
+
+#playmatWrapper img:not(#searchIcon, #backToMenu) {
+  height: 90%;
+  max-height: 58px;
+}
+
+#backToMenu{
+  border: 2px black solid;
+  width: fit-content;
+  margin: 2px 0 0 2px;
+}
+
+#backToMenu:hover{
+  border: 2px white solid;
+}
+
+#backToMenu button{
+  background-image: url("./assets/image/button-bg.png");
+  background-size: cover;
+  padding: 1vmin;
+  color: white;
+  font-size: 2vmin;
+  font-family: MinecraftRegular;
+  border-top: gray 2px solid;
+  border-right: rgb(88, 88, 88) 2px solid;
+  border-bottom: rgb(88, 88, 88) 4px solid;
+  border-left: gray 2px solid;
+}
+
+#craftingTable,
+.tipCrafting {
+  grid-area: craftingTable;
+  display: grid;
+  align-items: center;
+  -webkit-grid-template-columns: max-content;
+  -moz-grid-template-columns: max-content;
+  -ms-grid-template-columns: max-content;
+  grid-template-columns: max-content;
+  grid-template-areas:
+    "title . ."
+    "craft arrow item";
+  justify-content: center;
+  height: min-content;
+  padding-left: 3vmin;
+  gap: 0 2vmin;
+  margin: auto;
+}
+
+#supportUs{
+  grid-area: patreon;
+  width: 8vmin;
+  height: 8vmin;
+  background-color: rgb(196, 199, 196);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-top: 2px solid rgb(254, 255, 255);
+  border-right: 2px solid rgb(57, 56, 56);
+  border-bottom: 2px solid rgb(51, 50, 50);
+  border-left: 2px solid rgb(255, 254, 254);
+}
+
+.tipCrafting {
+  grid-template-areas:
+    "craft arrow item";
+}
+
+#craftingTitle {
+  text-align: start;
+  font-size: 5vmin;
+  grid-area: title;
+}
+
+#craftingTable>table,
+.tipCrafting>table {
+  grid-area: craft;
+  width: max-content;
+  padding-left: 5px;
+  border-collapse: collapse;
+}
+
+#craftingTable td,
+#item,
+.itemSlot,
+.tipCrafting td,
+.tippedItem {
+  width: 8vmin;
+  height: 8vmin;
+  border-top: 2px solid rgb(51, 50, 50);
+  border-right: 2px solid rgb(255, 254, 254);
+  border-bottom: 2px solid rgb(254, 255, 255);
+  border-left: 2px solid rgb(57, 56, 56);
+  padding: 0;
+  background-color: rgb(138, 139, 139);
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  margin: 1px;
+}
+
+#craftingArrow {
+  grid-area: arrow;
+  height: 8vmin;
+}
+
+#item,
+.tippedItem {
+  grid-area: item;
+  width: 10vmin;
+  height: 10vmin;
+}
+
+#items {
+  grid-area: items;
+  justify-self: end;
+  display: grid;
+  grid-template-rows: min-content auto;
+  width: 100%;
+  height: 98vh;
+  padding-bottom: 2vmin;
+}
+
+.itemSlot {
+  width: 32px;
+  height: 32px;
+}
+
+#itemBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 50px 10px 0;
+  justify-self: stretch;
+}
+
+#inventoryTitle {
+  padding-top: 10px;
+  font-size: 20px;
+}
+
+#itemSearch {
+  height: min-content;
+  background-color: rgb(55, 54, 54);
+  display: flex;
+  padding: 5px 20px;
+}
+
+#searchIcon {
+  height: 30px;
+}
+
+#search {
+  margin: 0;
+  padding: 0;
+  background-color: rgb(1, 0, 1);
+  color: rgb(124, 125, 124);
+  font-family: MinecraftRegular;
+  border: 2px solid rgb(158, 158, 159);
+  padding: 5px;
+  font-size: 15px;
+}
+
+#search::placeholder {
+  color: rgb(124, 125, 124);
+  font-family: MinecraftItalic;
+}
+
+#inventory {
+  overflow-y: scroll;
+}
+
+#slots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1px;
+  justify-content: end;
+  padding: 0 10px;
+}
+
+#tips {
+  display: grid;
+  grid-template-rows: min-content min-content;
+  grid-area: tips;
+  gap: 3vh;
+  padding: 0 4vmin;
+  align-self: end;
+}
+
+#tipsContainer {
+  display: grid;
+  grid-template-rows: min-content min-content;
+}
+
+#tipsList {
+  display: flex;
+  flex-direction: column-reverse;
+  overflow-y: scroll;
+  height: 33vh;
+}
+
+#hintsTitle,
+#tipsTitle {
+  font-size: 4vmin;
+}
+
+#hints {
+  display: flex;
+  justify-content: space-between;
+}
+
+#hints>div {
+  width: 30%;
+  height: 10vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#hints button {
+  background-color: rgb(59, 132, 39);
+  border-top: 1vmin solid rgb(101, 157, 80);
+  border-right: 1vmin solid rgb(28, 63, 19);
+  border-bottom: 1vmin solid rgb(22, 79, 14);
+  border-left: 1vmin solid rgb(66, 115, 52);
+  padding: 1vmin;
+  color: white;
+  width: 100%;
+  height: 100%;
+  font-family: MinecraftRegular;
+  font-size: 2vmin;
+}
+
+#hints button:hover,
+#achievementButton:hover,
+#error button:hover {
+  background-color: rgb(53, 113, 36);
+  border-top: 1vmin solid rgb(93, 144, 74);
+  border-right: 1vmin solid rgb(25, 56, 17);
+  border-bottom: 1vmin solid rgb(19, 71, 13);
+  border-left: 1vmin solid rgb(54, 95, 43);
+  color: rgb(219, 219, 219);
+}
+
+.hint {
+  background-color: rgb(138, 139, 139);
+  border-top: 2px solid rgb(51, 50, 50);
+  border-right: 2px solid rgb(255, 254, 254);
+  border-bottom: 2px solid rgb(254, 255, 255);
+  border-left: 2px solid rgb(57, 56, 56);
+  color: rgb(39, 39, 39);
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 2vmin;
+}
+
+table .wrong {
+  background-color: rgb(176, 46, 38);
+  border-top: 2px solid rgb(51, 50, 50);
+  border-right: 2px solid rgb(255, 254, 254);
+  border-bottom: 2px solid rgb(254, 255, 255);
+  border-left: 2px solid rgb(57, 56, 56);
+}
+
+table .semi-correct {
+  background-color: rgb(255, 170, 0);
+  border-top: 2px solid rgb(51, 50, 50);
+  border-right: 2px solid rgb(255, 254, 254);
+  border-bottom: 2px solid rgb(254, 255, 255);
+  border-left: 2px solid rgb(57, 56, 56);
+}
+
+table .correct {
+  background-color: rgb(59, 132, 39);
+  border-top: 2px solid rgb(51, 50, 50);
+  border-right: 2px solid rgb(255, 254, 254);
+  border-bottom: 2px solid rgb(254, 255, 255);
+  border-left: 2px solid rgb(57, 56, 56);
+}
+
+.tipCrafting td,
+.tippedItem {
+  width: 5vmin;
+  height: 5vmin;
+}
+
+.craftingArrow {
+  height: 7vmin;
+}
+
+#achievement {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  grid-template-areas:
+    "aimage atitle abutton"
+    "aimage atext atext";
+  justify-content: center;
+  align-items: center;
+  gap: 0 5px;
+  position: absolute;
+  top: -100px;
+  right: 0;
+  background-color: rgb(34, 34, 34);
+  padding: 5px 10px;
+  border: 3px solid rgb(87, 87, 87);
+  border-radius: 5px;
+  font-size: 20px;
+  margin: 5px;
+  animation-name: achievement;
+  animation-duration: 2s;
+  animation-fill-mode: forwards;
+}
+
+@keyframes achievement {
+  0% {
+    top: -100px
+  }
+
+  100% {
+    top: 0
+  }
+}
+
+#achievementImage {
+  grid-area: aimage;
+  height: 100%;
+}
+
+#achievementTitle {
+  grid-area: atitle;
+  color: rgb(229, 165, 238)
+}
+
+#achievementButton,
+#errorButton {
+  grid-area: abutton;
+  background-color: rgb(59, 132, 39);
+  border-top: 1vmin solid rgb(101, 157, 80);
+  border-right: 1vmin solid rgb(28, 63, 19);
+  border-bottom: 1vmin solid rgb(22, 79, 14);
+  border-left: 1vmin solid rgb(66, 115, 52);
+  color: white;
+  width: fit-content;
+  justify-self: end;
+  font-family: MinecraftRegular;
+}
+
+#achievementText {
+  grid-area: atext;
+  color: rgb(233, 233, 232)
+}
+
+#selected {
+  background-color: rgb(59, 132, 39);
+  border-top: 2px solid rgb(101, 157, 80);
+  border-right: 2px solid rgb(28, 63, 19);
+  border-bottom: 2px solid rgb(22, 79, 14);
+  border-left: 2px solid rgb(66, 115, 52);
+}
+
+#errorBorder{
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.575);
+}
+
+#error {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: rgb(51, 50, 50);
+  background-image: url("./assets/image/error-bg.jpg");
+  background-position: center;
+  background-size: cover;
+  max-width: 700px;
+  width: 70%;
+  height: 50%;
+  border: 3px solid rgb(51, 50, 50);
+}
+
+#errorContent {
+  display: flex;
+  flex-direction: column;
+  padding: 0px;
+  width: 50%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.452);
+}
+
+#errorCode {
+  margin-left: 20px;
+  color: rgb(255, 170, 0);
+}
+
+#errorTitle {
+  margin-left: 20px;
+  color: rgb(176, 46, 38);
+}
+
+#errorText {
+  margin: 0 20px;
+}
+
+#errorButton {
+  justify-self: center;
+  align-self: center;
+  width: 50%;
+  margin: auto;
+}
+
+@media only screen and (max-width: 895px) {
+  #itemBar {
+    flex-direction: column;
+    padding: 0;
+  }
+
+  #itemSearch {
+    width: 60%;
+  }
+
+  #search {
+    width: 100%;
+  }
+}
+
+@media (pointer:none) and (orientation: portrait),
+(pointer:coarse) and (orientation: portrait) {
+  #playmatWrapper {
+    grid-template-columns: 1fr;
+    grid-template-rows: min-content auto min-content auto;
+    grid-template-areas:
+      "back"
+      "items"
+      "craftingTable"
+      "tips";
+    gap: 0;
+  }
+
+  #items {
+    height: 30vh;
+  }
+
+  #inventory {
+    margin-top: 5px;
+    width: 100vw;
+  }
+
+  #slots {
+    justify-content: center;
+  }
+
+  #craftingTable {
+    padding: 0;
+  }
+
+  #craftingTitle {
+    font-size: 5vw;
+  }
+
+  #craftingTable td,
+  #item {
+    width: 8vmin;
+    height: 8vmin;
+  }
+
+  .itemSlot {
+    width: 5vmin;
+    height: 5vmin;
+  }
+
+  #hints button {
+    font-size: 4vw;
+  }
+
+  .hint {
+    font-size: 3.5vw;
+  }
+
+  #tipsList {
+    height: 20vh;
+  }
+
+  .tipCrafting td,
+  .tippedItem {
+    width: 6vmin;
+    height: 6vmin;
+  }
+
+  #achievement {
+    font-size: 4vw;
+    right: 50%;
+    transform: translateX(50%);
+    margin: 5px auto;
+    max-width: 90%;
+    width: max-content;
+    padding-bottom: 10px;
+  }
+
+  #errorContent {
+    width: 100%;
+  }
+}

@@ -153,10 +153,11 @@ io.on('connection', async (socket) => {
         };
     });
 
-    socket.on("newRiddle", async () => {
+    socket.on("newRiddle", async (data) => {
+        let mode = data.mode
         let exist = riddles[socket.id] == undefined
         try {
-            await createRiddle(socket);
+            await createRiddle(socket, mode);
         } catch (e) {
             socket.emit('error', { error: e.message });
         }
@@ -434,7 +435,7 @@ async function convertRecipes() {
     }
 }
 
-async function createRiddle(socket) {
+async function createRiddle(socket, mode) {
     try {
         if (recipes == null) {
             await convertRecipes();
@@ -442,7 +443,7 @@ async function createRiddle(socket) {
         let riddle
         do {
             riddle = recipes[Math.floor(Math.random() * recipes.length)];
-        } while (!validateRiddle(riddle));
+        } while (!validateRiddle(riddle, mode));
         if (riddles[socket.id] == undefined) {
             riddles[socket.id] = {}
         }
@@ -556,7 +557,7 @@ function convertRiddle(riddle) {
     return riddle;
 }
 
-function validateRiddle(riddle) {
+function validateRiddle(riddle, mode) {
     let numberOfMaterials = 0;
     let materials = new Set();
     let is_self_craft = false;
@@ -575,7 +576,7 @@ function validateRiddle(riddle) {
             if (material == riddle.item) is_self_craft |= true;
         });
     });
-    return numberOfMaterials > 1 && !is_self_craft && materials.size > 1;
+    return (numberOfMaterials > 1 && !is_self_craft && materials.size > 1) || mode == 1;
 }
 
 server.listen(port, () => {
