@@ -159,7 +159,7 @@ function createPossibleCombinations(riddle, data){
 }
 
 function markMatches(result, tip, riddle){
-    let data = gatherCorrectItems(riddle.recipe)
+    let data = riddle.materials
     let materials = data.shapedItems;
     let solved = result.matches == data.essentialItemsNum && result.matches == gatherCorrectItems(tip).essentialItemsNum;
     let matches = [];
@@ -268,7 +268,7 @@ function removeFromMaterials(data, item){
 function checkShapelessRecipe(riddle, data){
     let result = [];
     let matches = 0;
-    let mats = gatherCorrectItems(riddle.recipe);
+    let mats = riddle.materials;
     let wrongMat = false;
     let correctMaterials = mats.shapelessItems
     data.originalRecipe.forEach(item => {
@@ -351,6 +351,7 @@ async function createRiddle(socket) {
         } while (!validateRiddle(riddle));
         riddles[socket.id] = {};
         riddles[socket.id]["riddle"] = riddle;
+        riddles[socket.id]["riddle"]["materials"] = gatherCorrectItems(riddle.recipe)
         riddles[socket.id]["tips"] = 0;
         riddles[socket.id]["tippedItems"] = [];
         riddles[socket.id]["hints"] = await generateHints(riddle);
