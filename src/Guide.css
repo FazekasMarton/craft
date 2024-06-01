@@ -1,0 +1,63 @@
+#guideWrapper{
+    height: 100%;
+    width: 100%;
+    display: grid;
+    grid-template-columns: min-content auto;
+    color: rgb(85, 85, 84);
+}
+
+#contentTable{
+    background-image: url("./assets/image/stone-bg.png");
+    background-size: 64px;
+    padding: 20px;
+}
+
+#contentTable > ul{
+    padding: 0;
+}
+
+#contentTable li{
+    list-style: none;
+}
+
+#contentTable > ul a{
+    text-decoration: none;
+    color: yellow
+}
+
+#contentTable > ul a:hover{
+    color: rgb(229, 165, 238)
+}
+
+#contentTable #backToMenu{
+    display: block;
+    margin: auto;
+    width: auto;
+}
+
+#contentTable #backToMenu button{
+    width: 100%;
+}
+
+#content{
+    background-size: 64px;
+    padding: 20px;
+}
+
+#content b{
+    color: red;
+}
+
+#controlContent{
+    display: flex;
+    gap: 8vmin;
+    text-align: justify;
+}
+
+#controlContent > div{
+    flex-grow: 1;
+}
+
+#controlContent > div video{
+    width: 100%;
+}
