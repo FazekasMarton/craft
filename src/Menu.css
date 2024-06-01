@@ -25,12 +25,10 @@ body,
     margin: 0;
     font-family: MinecraftRegular;
     color: white;
-    overflow: hidden;
 }
 
 #menuWrapper{
     background-color: rgb(194, 195, 195);
-    background-image: url("./assets/image/menu-bg.png");
     background-repeat: repeat-x;
     background-position: 0 0;
     background-size: cover;
@@ -60,7 +58,7 @@ body,
         "info";
     background-color: transparent;
     gap: 5vh;
-    backdrop-filter: blur(5px);
+    overflow: hidden;
 }
 
 #title{
