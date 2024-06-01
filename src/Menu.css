@@ -49,13 +49,13 @@ body,
 
 #menuContainer {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
     grid-template-rows: min-content min-content auto min-content;
     grid-template-areas:
-        "title"
-        "mods"
-        "others"
-        "info";
+        "title title"
+        "mods mods"
+        "others others"
+        "info plagium";
     background-color: transparent;
     gap: 5vh;
     overflow: hidden;
@@ -125,6 +125,19 @@ body,
 #info{
     grid-area: info;
     margin: 5px;
+    align-self: self-end;
+}
+
+#plagium{
+    grid-area: plagium;
+    margin: 5px;
+    align-self: self-end;
+    justify-self: self-end;
+    font-size: 10px;
+}
+
+#mojangsRule{
+    width: fit-content;
 }
 
 #menuWrapper a{

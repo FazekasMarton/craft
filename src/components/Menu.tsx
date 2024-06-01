@@ -75,6 +75,9 @@ function Menu(){
                     <div id="creators">by Guideian Angel</div>
                     <div id="version">vAlfa</div>
                 </div>
+                <div id="plagium">
+                    <div id="mojangsRule">NOT AN OFFICIAL MINECRAFT PRODUCT. NOT APPROVED BY OR ASSOCIATED WITH MOJANG OR MICROSOFT</div>
+                </div>
             </div>
             <Outlet/>
         </div>
