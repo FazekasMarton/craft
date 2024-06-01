@@ -101,7 +101,6 @@ io.on('connection', async (socket) => {
 
     socket.on("checkTip", (data) => {
         try {
-            console.log("megjött");
             if (!riddles[socket.id]["tippedItems"].includes(data.craftedItem)) {
                 riddles[socket.id]["tips"]++;
                 riddles[socket.id]["tippedItems"].push(data.craftedItem);
@@ -122,7 +121,6 @@ io.on('connection', async (socket) => {
                 });
             }
         } catch (e) {
-            console.log("elkaptam")
             socket.emit('error', { error: e.message });
         }
     });
@@ -168,7 +166,7 @@ function createPossibleCombinations(riddle, data) {
 }
 
 function markMatches(result, tip, riddle) {
-    let data = gatherCorrectItems(riddle.recipe);
+    let data = riddle.materials;
     let materials = data.shapedItems.slice();
     let solved = result.matches === data.essentialItemsNum && result.matches === gatherCorrectItems(tip).essentialItemsNum;
     let matches = [];
@@ -366,23 +364,38 @@ async function createRiddle(socket) {
 
 async function generateHints(riddle) {
     let hints = {};
-    hints["hint1"] = `Number of items: ${gatherCorrectItems(riddle.recipe).essentialItemsNum}}`;
-    hints["hint2"] = `Number of different materials (min): ${findDifferentMaterials(riddle.recipe)}`;
+    hints["hint1"] = `Number of items: ${riddle.materials.essentialItemsNum}}`;
+    hints["hint2"] = findCommonItem(riddle);
     hints["hint3"] = `Random material: ${randomizeMaterial(riddle.recipe)}`;
     return hints;
 }
 
-function findDifferentMaterials(recipe) {
-    let materials = new Set();
-    recipe.forEach(row => {
-        row.forEach(material => {
-            if (!(Array.isArray(material) && material.includes(null) || material == null)) {
-                if (Array.isArray(material)) material = material.join(", ");
-                materials.add(material);
+function findCommonItem(riddle){
+    let randomMaterials = shuffleArray(riddle.materials.shapelessItems);
+    let resultRecipe;
+    outerloop: for(let i = 0; i < randomMaterials.length; i++){
+        for (let j = 0; j < recipes.length; j++) {
+            const recipe = recipes[j];
+            if (!recipe.shapeless && recipe.item != riddle.item) {
+                if (gatherCorrectItems(recipe.recipe).shapelessItems.includes(randomMaterials[i])) {
+                    resultRecipe = `This recipe has a common item: ${recipe.item}`;
+                    break outerloop;
+                }
             }
-        });
-    });
-    return materials.size;
+        }
+    }
+    if(resultRecipe == undefined){
+        resultRecipe = "This recipe has unique items!"
+    }
+    return resultRecipe;
+}
+
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
 }
 
 function randomizeMaterial(materials) {
