@@ -24,6 +24,11 @@ function Guide(){
                         <li><a href="#gameplayGuessing">Guessing Rules</a></li>
                         <li><a href="#outcome">Outcome</a></li>
                     </ul>
+                    <li><a href="#gamemodes">Gamemodes</a></li>
+                    <ul>
+                        <li><a href="#classicMode">Classic</a></li>
+                        <li><a href="#allInOneMode">All In One</a></li>
+                    </ul>
                 </ul>
                 <Outlet/>
             </div>
@@ -71,6 +76,26 @@ function Guide(){
                             <p>Important: We shape the feedback in such a way that the best results are returned, so you may experience "<b>recipe sliding</b>" during the game.</p>
                             <p><b>Recipe sliding</b>: When the size of an object's crafting recipe is smaller than 3x3, than it can be placed in several places in the crafting table. For example: Stone Button, Iron Sword, Crafting Table, etc.</p>
                         </div>
+                    </div>
+                </div>
+                <div id="gamemodes">
+                    <h1>Gamemodes</h1>
+                    <div id="classicMode">
+                        <h2>Classic</h2>
+                        <div>Rules: </div>
+                        <ul>
+                            <li>Crafting Table Size: 3x3</li>
+                            <li>Recipes: Every except those made of 1 piece of material or one type of material</li>
+                            <li>Hints: 3 (1 for every 5th guess)</li>
+                        </ul>
+                    </div>
+                    <div id="allInOneMode">
+                        <h2>All In One</h2>
+                        <div>Based on: Classic Mode</div>
+                        <div>Rule chages: </div>
+                        <ul>
+                            <li>Recipes: Every</li>
+                        </ul>
                     </div>
                 </div>
             </div>

@@ -1,4 +1,4 @@
-#guideWrapper{
+#guideWrapper {
     height: 100%;
     width: 100%;
     display: grid;
@@ -6,76 +6,110 @@
     color: rgb(85, 85, 84);
 }
 
-#contentTable{
+#contentTable {
     background-image: url("./assets/image/stone-bg.png");
     background-size: 64px;
     padding: 20px;
     width: max-content;
 }
 
-#contentTable > ul{
+#guideWrapper #backToMenu button{
+    background-image: url("./assets/image/button-bg.png");
+    background-size: cover;
+    padding: 5px;
+    color: white;
+    font-family: MinecraftRegular;
+    border-top: gray 2px solid;
+    border-right: rgb(88, 88, 88) 2px solid;
+    border-bottom: rgb(88, 88, 88) 4px solid;
+    border-left: gray 2px solid;
+  }
+
+#contentTable>ul {
     padding: 0;
 }
 
-#contentTable li{
+#contentTable>ul>ul {
+    margin-bottom: 20px;
+    line-height: 20px;
+}
+
+#contentTable li {
     list-style: none;
 }
 
-#contentTable > ul a{
+#contentTable>ul a {
     text-decoration: none;
     color: yellow
 }
 
-#contentTable > ul a:hover{
+#contentTable>ul a:hover {
     color: rgb(229, 165, 238)
 }
 
-#contentTable #backToMenu{
+#contentTable #backToMenu {
     display: block;
     margin: auto;
     width: auto;
 }
 
-#contentTable #backToMenu button{
+#contentTable #backToMenu button {
     width: 100%;
 }
 
-#content{
+#content {
     background-size: 64px;
     padding: 20px;
     overflow-y: scroll;
 }
 
-#content ul{
+#content ul {
     list-style: square;
 }
 
-#content b:not(.indicator){
+#content b:not(.indicator) {
     color: red;
 }
 
-#controlContent{
+#controlContent {
     display: flex;
     gap: 8vmin;
     text-align: justify;
 }
 
-#controlContent > div{
+#controlContent>div {
     flex-grow: 1;
 }
 
-#controlContent > div video{
+#controlContent>div video {
     width: 100%;
 }
 
-#redIndicator{
+#redIndicator {
     color: red;
 }
 
-#yellowIndicator{
+#yellowIndicator {
     color: yellow;
 }
 
-#greenIndicator{
+#greenIndicator {
     color: green;
+}
+
+@media only screen and (max-width: 800px) {
+    #controlContent{
+        flex-direction: column;
+        gap: 0;
+    }
+}
+
+@media only screen and (max-width: 500px) {
+    #guideWrapper {
+        grid-template-columns: auto;
+    }
+
+    #contentTable{
+        display: none;
+    }
 }

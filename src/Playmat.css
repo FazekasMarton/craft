@@ -51,7 +51,7 @@ body,
   border: 2px white solid;
 }
 
-#backToMenu button{
+#playmatWrapper #backToMenu button{
   background-image: url("./assets/image/button-bg.png");
   background-size: cover;
   padding: 1vmin;
