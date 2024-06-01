@@ -10,6 +10,7 @@
     background-image: url("./assets/image/stone-bg.png");
     background-size: 64px;
     padding: 20px;
+    width: max-content;
 }
 
 #contentTable > ul{
@@ -42,9 +43,14 @@
 #content{
     background-size: 64px;
     padding: 20px;
+    overflow-y: scroll;
 }
 
-#content b{
+#content ul{
+    list-style: square;
+}
+
+#content b:not(.indicator){
     color: red;
 }
 
@@ -60,4 +66,16 @@
 
 #controlContent > div video{
     width: 100%;
+}
+
+#redIndicator{
+    color: red;
+}
+
+#yellowIndicator{
+    color: yellow;
+}
+
+#greenIndicator{
+    color: green;
 }

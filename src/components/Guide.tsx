@@ -19,6 +19,11 @@ function Guide(){
                         <li><a href="#controlCopy">Copy</a></li>
                         <li><a href="#controlRemove">Remove</a></li>
                     </ul>
+                    <li><a href="#gameplay">Gameplay and Rules</a></li>
+                    <ul>
+                        <li><a href="#gameplayGuessing">Guessing Rules</a></li>
+                        <li><a href="#outcome">Outcome</a></li>
+                    </ul>
                 </ul>
                 <Outlet/>
             </div>
@@ -40,6 +45,31 @@ function Guide(){
                             <h2>Remove</h2>
                             <video src={removeVideo} autoPlay loop/>
                             <p>You can remove items from the slots with the <b>right mouse click</b>.</p>
+                        </div>
+                    </div>
+                </div>
+                <div id="gameplay">
+                    <h1>Gameplay and Rules</h1>
+                    <p>You have to solve a crafting riddle by guessing crafting recipes. You will get some hints during the game.</p>
+                    <div id="gameplayContent">
+                        <div id="gameplayGuessing">
+                            <h2>Guessing Rules</h2>
+                            <ul>
+                                <li>You can only guess an existing item's recipe</li>
+                                <li>You can only guess a recipe once (but some items has more than one recipe)</li>
+                            </ul>
+                        </div>
+                        <div id="outcome">
+                            <h2>Outcome</h2>
+                            <p>After you guessed, it turns out how many materials were correct in the recipe. In this regard, you may encounter three indications.</p>
+                            <ul>
+                                <li><b className="indicator" id="redIndicator">Red</b>: The materials marked in red are not found in the recipe.</li>
+                                <li><b className="indicator" id="yellowIndicator">Yellow</b>: The materials marked in yellow are found in the recipe but are not in their place.</li>
+                                <li><b className="indicator" id="greenIndicator">Green</b>: The materials marked in green can be found in the recipe and are in their place.</li>
+                                (Empty slots are not marked!)
+                            </ul>
+                            <p>Important: We shape the feedback in such a way that the best results are returned, so you may experience "<b>recipe sliding</b>" during the game.</p>
+                            <p><b>Recipe sliding</b>: When the size of an object's crafting recipe is smaller than 3x3, than it can be placed in several places in the crafting table. For example: Stone Button, Iron Sword, Crafting Table, etc.</p>
                         </div>
                     </div>
                 </div>
