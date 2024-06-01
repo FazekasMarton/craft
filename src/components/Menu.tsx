@@ -68,6 +68,7 @@ function Menu(){
                     <Link onClick={() => { clickAudio.play() }} to="/allinone"><button>All In One</button></Link>
                 </div>
                 <div id="others">
+                    <Link onClick={() => { clickAudio.play() }} to="/"><button>How To Play</button></Link>
                     <a onClick={() => { clickAudio.play() }} href="http://patreon.com/Craftdle" target="_blank"><button>Support Us</button></a>
                 </div>
                 <div id="info">

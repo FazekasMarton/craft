@@ -106,14 +106,20 @@ body,
     align-items: center;
     flex-wrap: wrap;
     gap: 2vh;
+    width: 70vw;
+    justify-self: center;
 }
 
 #others{
     grid-area: others;
-    display: flex;
-    justify-content: center;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    justify-content: space-between;
     align-items: start;
     flex-wrap: wrap;
+    width: 70vw;
+    justify-self: center;
 }
 
 #info{
@@ -123,12 +129,13 @@ body,
 
 #menuWrapper a{
     border: 2px black solid;
+    width: 100%;
 }
 
 #menuWrapper button{
     background-image: url("./assets/image/button-bg.png");
     background-size: cover;
-    width: 90vmin;
+    width: 100%;
     padding: 5px;
     color: white;
     font-family: MinecraftRegular;
@@ -137,6 +144,7 @@ body,
     border-right: rgb(88, 88, 88) 2px solid;
     border-bottom: rgb(88, 88, 88) 4px solid;
     border-left: gray 2px solid;
+    font-size: 4vmin;
 }
 
 #menuWrapper a:hover{
