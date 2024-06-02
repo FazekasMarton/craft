@@ -74,7 +74,7 @@ function Guide(){
                                 (Empty slots are not marked!)
                             </ul>
                             <p>Important: We shape the feedback in such a way that the best results are returned, so you may experience "<b>recipe sliding</b>" during the game.</p>
-                            <p><b>Recipe sliding</b>: When the size of an object's crafting recipe is smaller than 3x3, than it can be placed in several places in the crafting table. For example: Stone Button, Iron Sword, Crafting Table, etc.</p>
+                            <p><b>Recipe sliding</b>: When the size of an object's crafting recipe is smaller than 3x3, so it can be placed in several places in the crafting table. For example: Stone Button, Iron Sword, Crafting Table, etc.</p>
                         </div>
                     </div>
                 </div>
