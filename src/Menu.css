@@ -1,0 +1,165 @@
+@font-face {
+    font-family: MinecraftRegular;
+    src: url("./assets/minecraft-font/MinecraftRegular-Bmg3.otf");
+}
+
+@font-face {
+    font-family: MinecraftItalic;
+    src: url("./assets/minecraft-font/MinecraftItalic-R8Mo.otf");
+}
+
+* {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+html,
+body,
+#wrapper,
+#menuWrapper,
+#menuContainer {
+    height: 100%;
+    padding: 0;
+    margin: 0;
+    font-family: MinecraftRegular;
+    color: white;
+}
+
+#menuWrapper{
+    background-color: rgb(194, 195, 195);
+    background-repeat: repeat-x;
+    background-position: 0 0;
+    background-size: cover;
+    animation-name: bg;
+    animation-duration: 86400s;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+}
+
+@keyframes bg {
+    0% {
+        background-position: 0px 0;
+    }
+    100% {
+        background-position: 86400% 0;
+    }
+}
+
+#menuContainer {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: min-content min-content auto min-content;
+    grid-template-areas:
+        "title title"
+        "mods mods"
+        "others others"
+        "info plagium";
+    background-color: transparent;
+    gap: 5vh;
+    overflow: hidden;
+}
+
+#title{
+    grid-area: title;
+    width: min-content;
+    justify-self: center;
+    position: relative;
+}
+
+#craftdleTitle{
+    height: 20vmin;
+}
+
+#message{
+    width: max-content;
+    position: absolute;
+    right: 5%;
+    bottom: 30%;
+    transform: translate(50%, 50%) rotate(-20deg);
+    color: yellow;
+    font-size: 4vmin;
+    animation-name: message;
+    animation-duration: 0.5s;
+    animation-iteration-count: infinite;
+    animation-timing-function: linear;
+}
+
+@keyframes message {
+    0% {
+        transform: translate(50%, 50%) rotate(-20deg) scale(1);
+    }
+    50% {
+        transform: translate(50%, 50%) rotate(-20deg) scale(1.05);
+    }
+    100% {
+        transform: translate(50%, 50%) rotate(-20deg) scale(1);
+    }
+}
+
+#gameModes{
+    grid-area: mods;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 2vh;
+    width: 70vw;
+    justify-self: center;
+}
+
+#others{
+    grid-area: others;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    justify-content: space-between;
+    align-items: start;
+    flex-wrap: wrap;
+    width: 70vw;
+    justify-self: center;
+}
+
+#info{
+    grid-area: info;
+    margin: 5px;
+    align-self: self-end;
+}
+
+#plagium{
+    grid-area: plagium;
+    margin: 5px;
+    align-self: self-end;
+    justify-self: self-end;
+    font-size: 10px;
+}
+
+#mojangsRule{
+    width: fit-content;
+}
+
+#menuWrapper a{
+    border: 2px black solid;
+    width: 100%;
+}
+
+#menuWrapper button{
+    background-image: url("./assets/image/button-bg.png");
+    background-size: cover;
+    width: 100%;
+    padding: 5px;
+    color: white;
+    font-family: MinecraftRegular;
+    font-size: 20px;
+    border-top: gray 2px solid;
+    border-right: rgb(88, 88, 88) 2px solid;
+    border-bottom: rgb(88, 88, 88) 4px solid;
+    border-left: gray 2px solid;
+    font-size: 4vmin;
+}
+
+#menuWrapper a:hover{
+    border: white 2px solid;
+}

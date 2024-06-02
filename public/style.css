@@ -1,0 +1,19 @@
+@font-face {
+    font-family: MinecraftRegular;
+    src: url("./minecraft-font/MinecraftRegular-Bmg3.otf");
+}
+
+html, body, #wrapper{
+    font-family: MinecraftRegular;
+    color: rgb(85, 85, 84);
+    background-color: rgb(194, 195, 195);
+}
+
+#charts > canvas {
+    border-top: 10px solid rgb(51, 50, 50);
+    border-right: 10px solid rgb(255, 254, 254);
+    border-bottom: 10px solid rgb(254, 255, 255);
+    border-left: 10px solid rgb(57, 56, 56);
+    padding: 10px;
+    background-color: rgb(138, 139, 139);
+}
