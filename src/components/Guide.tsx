@@ -92,7 +92,7 @@ function Guide(){
                     <div id="allInOneMode">
                         <h2>All In One</h2>
                         <div>Based on: Classic Mode</div>
-                        <div>Rule chages: </div>
+                        <div>Rule changes: </div>
                         <ul>
                             <li>Recipes: Every</li>
                         </ul>
