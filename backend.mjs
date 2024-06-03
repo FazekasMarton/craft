@@ -12,8 +12,10 @@ dotenv.config()
 
 const recipesDbServiceAccount = JSON.parse(process.env.RecipesKey)
 const itemsDbServiceAccount = JSON.parse(process.env.ItemsKey)
+const usersDbServiceAccount = JSON.parse(process.env.UsersKey)
 let recipesDbAdmin;
 let itemsDbAdmin;
+let usersDbAdmin;
 
 try {
     recipesDbAdmin = admin.initializeApp({
@@ -30,6 +32,16 @@ try {
         credential: admin.credential.cert(itemsDbServiceAccount),
         databaseURL: "https://craftdle-4ce47-default-rtdb.europe-west1.firebasedatabase.app"
     }, "items");
+} catch (e) {
+    console.error('Failed to initialize itemsDbAdmin:', e.message);
+    itemsDbAdmin = null;
+}
+
+try {
+    usersDbAdmin = admin.initializeApp({
+        credential: admin.credential.cert(usersDbServiceAccount),
+        databaseURL: "https://craftdle---users-default-rtdb.europe-west1.firebasedatabase.app"
+    }, "users");
 } catch (e) {
     console.error('Failed to initialize itemsDbAdmin:', e.message);
     itemsDbAdmin = null;
@@ -64,6 +76,10 @@ let items = null;
 let recipes = null;
 let riddles = {};
 
+app.get("/", (req, res) => {
+    res.sendFile(path.join(__dirname, 'admin.html'));
+})
+
 app.get("/items", async (req, res) => {
     try {
         if (itemsDbAdmin == null) {
@@ -92,14 +108,21 @@ app.get("/recipes", async (req, res) => {
     }
 });
 
-io.on('connection', async (socket) => {
-    try {
-        await createRiddle(socket);
-    } catch (e) {
-        socket.emit('error', { error: e.message });
-    }
+app.get('/minecraft-images/:imageName', (req, res) => {
+    const imageName = req.params.imageName;
+    const imagePath = path.join(__dirname, 'public/minecraft-images', imageName);
 
-    socket.on("checkTip", (data) => {
+    console.log(imagePath)
+
+    res.sendFile(imagePath, (err) => {
+        if (err) {
+            res.status(404).send('Image not found');
+        }
+    });
+});
+
+io.on('connection', async (socket) => {
+    socket.on("checkTip", async (data) => {
         try {
             if (!riddles[socket.id]["tippedItems"].includes(data.craftedItem)) {
                 riddles[socket.id]["tips"]++;
@@ -119,24 +142,96 @@ io.on('connection', async (socket) => {
                     },
                     hints: getHints(socket)
                 });
+                if (result.solved) {
+                    riddles[socket.id].streak += 1
+                    await updateUsersData("solvedRiddles")
+                    io.to("admin").emit("users", await getUsersData())
+                }
             }
         } catch (e) {
             socket.emit('error', { error: e.message });
-        }
+        };
     });
 
-    socket.on("newRiddle", () => {
+    socket.on("newRiddle", async (data) => {
+        let mode = data.mode
+        let exist = riddles[socket.id] == undefined
         try {
-            createRiddle(socket);
+            await createRiddle(socket, mode);
         } catch (e) {
             socket.emit('error', { error: e.message });
         }
-    });
+        if (exist) {
+            await updateUsersData("visitors")
+            io.to("admin").emit("users", await getUsersData())
+        }
+    })
 
-    socket.on("disconnect", () => {
-        delete riddles[socket.id];
-    });
+    socket.on("login", async () => {
+        socket.join("admin")
+        socket.emit("users", await getUsersData())
+    })
+
+    socket.on("disconnect", async () => {
+        let streak = riddles[socket.id]?.streak
+        if (streak > 0) {
+            await addStreak(streak)
+        }
+        delete riddles[socket.id]
+        io.to("admin").emit("users", await getUsersData())
+    })
 });
+
+async function addStreak(streak) {
+    if (port != 6969) {
+        const db = usersDbAdmin.database();
+        const ref = db.ref(`/streakPerPlayers`);
+        await ref.transaction(currentData => {
+            if (!Array.isArray(currentData)) {
+                return [streak];
+            } else {
+                currentData.push(streak);
+                return currentData;
+            }
+        });
+    }
+}
+
+async function updateUsersData(path) {
+    if (port != 6969) {
+        const db = usersDbAdmin.database();
+        const userRef = db.ref(`/date/${getTodayDate()}/`);
+        const snapshot = await userRef.once('value');
+        const dataRef = userRef.child(path);
+        if (!snapshot.exists()) {
+            userRef.set({
+                "visitors": 0,
+                "solvedRiddles": 0
+            })
+        }
+        await dataRef.transaction((currentData) => {
+            if (currentData === null) {
+                return 1;
+            }
+            return currentData + 1;
+        });
+    }
+}
+
+async function getUsersData() {
+    let data = await getData(usersDbAdmin)
+    data["currentPlayers"] = Object.keys(riddles).length
+    data["todayDate"] = getTodayDate()
+    return data
+}
+
+function getTodayDate() {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
 
 function getHints(socket) {
     let hints = {
@@ -340,23 +435,28 @@ async function convertRecipes() {
     }
 }
 
-async function createRiddle(socket) {
+async function createRiddle(socket, mode) {
     try {
         if (recipes == null) {
             await convertRecipes();
         }
-        let riddle;
+        let riddle
         do {
             riddle = recipes[Math.floor(Math.random() * recipes.length)];
-        } while (!validateRiddle(riddle));
-        riddles[socket.id] = {};
-        riddles[socket.id]["riddle"] = riddle;
+        } while (!validateRiddle(riddle, mode));
+        if (riddles[socket.id] == undefined) {
+            riddles[socket.id] = {}
+        }
+        riddles[socket.id]["riddle"] = riddle
         riddles[socket.id]["riddle"]["materials"] = gatherCorrectItems(riddle.recipe)
-        riddles[socket.id]["tips"] = 0;
-        riddles[socket.id]["tippedItems"] = [];
-        riddles[socket.id]["hints"] = await generateHints(riddle);
+        riddles[socket.id]["tips"] = 0
+        riddles[socket.id]["tippedItems"] = []
+        riddles[socket.id]["hints"] = await generateHints(riddle)
         riddles[socket.id]["tippedRecipes"] = [];
-        console.log(riddles);
+        if (riddles[socket.id]["streak"] == undefined) {
+            riddles[socket.id]["streak"] = 0;
+        }
+        console.log(riddles)
     } catch (e) {
         throw new Error('Failed to create a riddle.');
     }
@@ -473,16 +573,26 @@ function convertRiddle(riddle) {
     return riddle;
 }
 
-function validateRiddle(riddle) {
+function validateRiddle(riddle, mode) {
     let numberOfMaterials = 0;
+    let materials = new Set();
     let is_self_craft = false;
     riddle.recipe.forEach(row => {
         row.forEach(material => {
-            if (material != null) numberOfMaterials++;
+            if (material != null) {
+                numberOfMaterials++;
+                if (Array.isArray(material)) {
+                    material.forEach(item => {
+                        materials.add(item)
+                    });
+                } else {
+                    materials.add(material)
+                }
+            }
             if (material == riddle.item) is_self_craft |= true;
         });
     });
-    return numberOfMaterials > 1 && !is_self_craft;
+    return (numberOfMaterials > 1 && !is_self_craft && materials.size > 1) || mode == 1;
 }
 
 server.listen(port, () => {

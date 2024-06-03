@@ -2,6 +2,10 @@ import craftingTableArrow from '../assets/image/craftingtablearrow.png'
 import { craftingTableProps } from "../interfaces/craftingTableProps"
 import { drop } from "../functions/drop"
 import { ReactNode } from 'react'
+import clickSound from "../assets/audio/click.mp3"
+
+const clickAudio = new Audio(clickSound)
+clickAudio.preload = "auto"
 
 function CraftingTable(props: craftingTableProps) {
   return (

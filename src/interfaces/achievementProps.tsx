@@ -3,6 +3,7 @@ import { item } from "./item"
 import { ReactNode } from "react"
 import { hints } from "./hints"
 import { Socket } from "socket.io-client"
+import { error } from "./error"
 
 interface achievementProps {
     result: tips | undefined,
@@ -15,7 +16,9 @@ interface achievementProps {
     setHints: (value: hints) => void, 
     setUsedHints: (value: Array<boolean>) => void, 
     setResult: (value: tips | undefined) => void,
-    socket: Socket
+    socket: Socket,
+    setError: (value: error | null) => void,
+    mode: number
 }
 
 export type { achievementProps }
