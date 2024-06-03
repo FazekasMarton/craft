@@ -297,16 +297,16 @@ function gatherCorrectItems(recipe) {
     recipe.forEach(row => {
         row.forEach(cell => {
             if (Array.isArray(cell)) {
-                if (!cell.includes(null)) {
+                if (!cell.includes(undefined)) {
                     essentialItemsNum++;
                 }
                 cell.forEach(item => {
-                    if (item != null) {
+                    if (item != undefined) {
                         shapelessItems.push(item);
                     }
                 });
                 shapedItems.push(cell);
-            } else if (cell != null) {
+            } else if (cell != undefined) {
                 shapelessItems.push(cell);
                 essentialItemsNum++;
                 shapedItems.push(cell);
@@ -364,7 +364,7 @@ async function createRiddle(socket) {
 
 async function generateHints(riddle) {
     let hints = {};
-    hints["hint1"] = `Number of items: ${riddle.materials.essentialItemsNum}}`;
+    hints["hint1"] = `Number of items: ${riddle.materials.essentialItemsNum}`;
     hints["hint2"] = findCommonItem(riddle);
     hints["hint3"] = `Random material: ${randomizeMaterial(riddle.recipe)}`;
     return hints;
@@ -378,7 +378,7 @@ function findCommonItem(riddle){
             const recipe = recipes[j];
             if (!recipe.shapeless && recipe.item != riddle.item) {
                 if (gatherCorrectItems(recipe.recipe).shapelessItems.includes(randomMaterials[i])) {
-                    resultRecipe = `This recipe has a common item: ${recipe.item}`;
+                    resultRecipe = `Material(s) in this recipe are also found in: ${recipe.item}`;
                     break outerloop;
                 }
             }
