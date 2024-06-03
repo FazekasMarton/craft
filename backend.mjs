@@ -375,6 +375,8 @@ function checkShapelessRecipe(riddle, data) {
         } else if (correctMaterials.includes(item)) {
             obj[key] = "correct";
             matches++;
+            let index = correctMaterials.indexOf(item);
+            correctMaterials.splice(index, 1);
         } else {
             obj[key] = "wrong";
             wrongMat = true;
@@ -592,7 +594,7 @@ function validateRiddle(riddle, mode) {
             if (material == riddle.item) is_self_craft |= true;
         });
     });
-    return (numberOfMaterials > 1 && !is_self_craft && materials.size > 1) || mode == 1;
+    return (numberOfMaterials > 1 && !is_self_craft && materials.size > 1 && riddle.shapeless) || mode == 1;
 }
 
 server.listen(port, () => {
