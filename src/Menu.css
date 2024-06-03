@@ -57,7 +57,7 @@ body,
         "others others"
         "info plagium";
     background-color: transparent;
-    gap: 6vh;
+    gap: 5vh;
     overflow: hidden;
 }
 
@@ -87,14 +87,8 @@ body,
 }
 
 @keyframes message {
-    0% {
-        transform: translate(50%, 50%) rotate(-20deg) scale(1);
-    }
     50% {
-        transform: translate(50%, 50%) rotate(-20deg) scale(1.05);
-    }
-    100% {
-        transform: translate(50%, 50%) rotate(-20deg) scale(1);
+        scale: 1.05;
     }
 }
 
@@ -162,11 +156,4 @@ body,
 
 #menuWrapper a:hover{
     border: white 2px solid;
-}
-
-@media only screen and (max-width: 800px) {
-    #message{
-        right: 16%;
-        bottom: 20%;
-    }
 }
