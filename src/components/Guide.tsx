@@ -38,17 +38,17 @@ function Guide(){
                     <div id="controlContent">
                         <div id="controlMove">
                             <h2>Move</h2>
-                            <video src={moveVideo} autoPlay loop/>
+                            <video src={moveVideo} autoPlay loop muted/>
                             <p>You can move items from a slot to another by holding the <b>left mouse click</b>.</p>
                         </div>
                         <div id="controlCopy">
                             <h2>Copy</h2>
-                            <video src={copyVideo} autoPlay loop/>
+                            <video src={copyVideo} autoPlay loop muted/>
                             <p>You can copy items by holding the <b>left</b> and the <b>right mouse clicks</b> at the same time.</p>
                         </div>
                         <div id="controlRemove">
                             <h2>Remove</h2>
-                            <video src={removeVideo} autoPlay loop/>
+                            <video src={removeVideo} autoPlay loop muted/>
                             <p>You can remove items from the slots with the <b>right mouse click</b>.</p>
                         </div>
                     </div>
