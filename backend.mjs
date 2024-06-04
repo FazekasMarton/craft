@@ -375,6 +375,8 @@ function checkShapelessRecipe(riddle, data) {
         } else if (correctMaterials.includes(item)) {
             obj[key] = "correct";
             matches++;
+            let index = correctMaterials.indexOf(item);
+            correctMaterials.splice(index, 1);
         } else {
             obj[key] = "wrong";
             wrongMat = true;
@@ -392,16 +394,16 @@ function gatherCorrectItems(recipe) {
     recipe.forEach(row => {
         row.forEach(cell => {
             if (Array.isArray(cell)) {
-                if (!cell.includes(null)) {
+                if (!cell.includes(undefined)) {
                     essentialItemsNum++;
                 }
                 cell.forEach(item => {
-                    if (item != null) {
+                    if (item != undefined) {
                         shapelessItems.push(item);
                     }
                 });
                 shapedItems.push(cell);
-            } else if (cell != null) {
+            } else if (cell != undefined) {
                 shapelessItems.push(cell);
                 essentialItemsNum++;
                 shapedItems.push(cell);
@@ -478,7 +480,7 @@ function findCommonItem(riddle){
             const recipe = recipes[j];
             if (!recipe.shapeless && recipe.item != riddle.item) {
                 if (gatherCorrectItems(recipe.recipe).shapelessItems.includes(randomMaterials[i])) {
-                    resultRecipe = `This recipe has a common item: ${recipe.item}`;
+                    resultRecipe = `Material(s) in this recipe are also found in: ${recipe.item}`;
                     break outerloop;
                 }
             }
@@ -592,7 +594,7 @@ function validateRiddle(riddle, mode) {
             if (material == riddle.item) is_self_craft |= true;
         });
     });
-    return (numberOfMaterials > 1 && !is_self_craft && materials.size > 1) || mode == 1;
+    return (numberOfMaterials > 1 && !is_self_craft && materials.size > 1 && riddle.shapeless) || mode == 1;
 }
 
 server.listen(port, () => {
