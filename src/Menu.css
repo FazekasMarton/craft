@@ -73,17 +73,19 @@ body,
 }
 
 #message{
-    width: max-content;
+    width: 31vw;
+    max-width: max-content;
     position: absolute;
     right: 5%;
     bottom: 30%;
     transform: translate(50%, 50%) rotate(-20deg);
     color: yellow;
-    font-size: 4vmin;
+    font-size: 3.5vmin;
     animation-name: message;
     animation-duration: 0.5s;
     animation-iteration-count: infinite;
     animation-timing-function: linear;
+    text-align: center;
 }
 
 @keyframes message {
@@ -128,6 +130,7 @@ body,
     align-self: self-end;
     justify-self: self-end;
     font-size: 10px;
+    text-align: end;
 }
 
 #mojangsRule{
