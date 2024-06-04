@@ -13,7 +13,7 @@
     width: max-content;
 }
 
-#guideWrapper #backToMenu button{
+#guideWrapper #backToMenu button {
     background-image: url("./assets/image/button-bg.png");
     background-size: cover;
     padding: 5px;
@@ -23,13 +23,17 @@
     border-right: rgb(88, 88, 88) 2px solid;
     border-bottom: rgb(88, 88, 88) 4px solid;
     border-left: gray 2px solid;
-  }
+}
+
+#contentTable ul {
+    padding-left: 20px;
+}
 
 #contentTable>ul {
     padding: 0;
 }
 
-#contentTable>ul>ul {
+#contentTable ul ul {
     margin-bottom: 20px;
     line-height: 20px;
 }
@@ -59,7 +63,7 @@
 
 #content {
     background-size: 64px;
-    padding: 20px;
+    padding: 0 20px 20px 20px;
     overflow-y: scroll;
 }
 
@@ -71,17 +75,25 @@
     color: red;
 }
 
-#controlContent {
+#pcControlContent,
+#mobileControlContent {
     display: flex;
     gap: 8vmin;
     text-align: justify;
 }
 
-#controlContent>div {
+#pcControlContent h3,
+#mobileControlContent h3 {
+    margin-top: 0;
+}
+
+#pcControlContent>div,
+#mobileControlContent>div {
     flex-grow: 1;
 }
 
-#controlContent>div video {
+#pcControlContent>div video,
+#mobileControlContent>div video {
     width: 100%;
 }
 
@@ -98,7 +110,9 @@
 }
 
 @media only screen and (max-width: 800px) {
-    #controlContent{
+
+    #pcControlContent,
+    #mobileControlContent {
         flex-direction: column;
         gap: 0;
     }
@@ -109,7 +123,7 @@
         grid-template-columns: auto;
     }
 
-    #contentTable{
+    #contentTable {
         display: none;
     }
 }

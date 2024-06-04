@@ -1,6 +1,9 @@
 import moveVideo from "../assets/video/move.mp4"
 import copyVideo from "../assets/video/copy.mp4"
 import removeVideo from "../assets/video/remove.mp4"
+import selectVideo from "../assets/video/select.mp4"
+import placeVideo from "../assets/video/place.mp4"
+import takeoutVideo from "../assets/video/takeout.mp4"
 import { Link, Outlet } from "react-router-dom"
 import clickSound from "../assets/audio/click.mp3"
 
@@ -15,9 +18,18 @@ function Guide(){
                 <ul>
                     <li><a href="#control">Control</a></li>
                     <ul>
-                        <li><a href="#controlMove">Move</a></li>
-                        <li><a href="#controlCopy">Copy</a></li>
-                        <li><a href="#controlRemove">Remove</a></li>
+                        <li><a href="#pcControl">PC</a></li>
+                        <ul>
+                            <li><a href="#controlMove">Move</a></li>
+                            <li><a href="#controlCopy">Copy</a></li>
+                            <li><a href="#controlRemove">Remove</a></li>
+                        </ul>
+                        <li><a href="#mobileControl">Mobile</a></li>
+                        <ul>
+                            <li><a href="#controlSelect">Select</a></li>
+                            <li><a href="#controlPlace">Place</a></li>
+                            <li><a href="#controlTakeout">Remove</a></li>
+                        </ul>
                     </ul>
                     <li><a href="#gameplay">Gameplay and Rules</a></li>
                     <ul>
@@ -35,21 +47,40 @@ function Guide(){
             <div id="content">
                 <div id="control">
                     <h1>Control</h1>
-                    <div id="controlContent">
+                    <h2 id="pcControl">PC</h2>
+                    <div id="pcControlContent">
                         <div id="controlMove">
-                            <h2>Move</h2>
+                            <h3>Move</h3>
                             <video src={moveVideo} autoPlay loop muted/>
-                            <p>You can move items from a slot to another by holding the <b>left mouse click</b>.</p>
+                            <p>You can move items from a slot to another by holding the <b>left mouse button</b>.</p>
                         </div>
                         <div id="controlCopy">
-                            <h2>Copy</h2>
+                            <h3>Copy</h3>
                             <video src={copyVideo} autoPlay loop muted/>
-                            <p>You can copy items by holding the <b>left</b> and the <b>right mouse clicks</b> at the same time.</p>
+                            <p>You can copy items by holding the <b>left</b> and the <b>right mouse buttons</b> at the same time.</p>
                         </div>
                         <div id="controlRemove">
-                            <h2>Remove</h2>
+                            <h3>Remove</h3>
                             <video src={removeVideo} autoPlay loop muted/>
-                            <p>You can remove items from the slots with the <b>right mouse click</b>.</p>
+                            <p>You can remove items from the slots by pressing the <b>right mouse button</b>.</p>
+                        </div>
+                    </div>
+                    <h2 id="mobileControl">Mobile</h2>
+                    <div id="mobileControlContent">
+                        <div id="controlSelect">
+                            <h3>Select</h3>
+                            <video src={selectVideo} autoPlay loop muted/>
+                            <p>You can select items by tapping on them in your inventory.</p>
+                        </div>
+                        <div id="controlPlace">
+                            <h3>Place</h3>
+                            <video src={placeVideo} autoPlay loop muted/>
+                            <p>You can place items in your crafting table by tapping on an empty slot.</p>
+                        </div>
+                        <div id="controlTakeout">
+                            <h3>Remove</h3>
+                            <video src={takeoutVideo} autoPlay loop muted/>
+                            <p>You can remove items from the slots by tapping on them.</p>
                         </div>
                     </div>
                 </div>
