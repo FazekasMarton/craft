@@ -366,7 +366,7 @@ function checkShapelessRecipe(riddle, data) {
     let matches = 0;
     let mats = riddle.materials;
     let wrongMat = false;
-    let correctMaterials = mats.shapelessItems;
+    let correctMaterials = mats.shapelessItems.slice();
     data.originalRecipe.forEach(item => {
         let obj = {};
         let key = item;
