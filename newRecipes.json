@@ -1,64 +1,74 @@
 {
-    "data": [
-        {
-            "name": "Example",
-            "id": "Example_1",
-            "recipe": [
-                null, null, null,
-                null, null, null,
-                null, null, null
-            ],
-            "shapless": false
-        },
-        {
-            "name": "Leather Tunic",
-            "id": "leather_tunic_1",
-            "recipe": [
-                "Leather", null, "Leather",
-                "Leather", "Leather", "Leather",
-                "Leather", "Leather", "Leather"
-            ],
-            "shapless": false
-        },
-        {
-            "name": "Leather Cap",
-            "id": "leather_cap_1",
-            "recipe": [
-                "Leather", "Leather", "Leather",
-                "Leather", null, "Leather",
-                null, null, null
-            ],
-            "shapless": false
-        },
-        {
-            "name": "Diamond Pickaxe",
-            "id": "diamond_pickaxe_1",
-            "recipe": [
-                "Diamond", "Diamond", "Diamond",
-                null, "Stick", null,
-                null, "Stick", null
-            ],
-            "shapless": false
-        },
-        {
-            "name": "Recovery Compass",
-            "id": "recovery_compass_1",
-            "recipe": [
-                "Echo Shard", "Echo Shard", "Echo Shard",
-                "Echo Shard", "Compass", "Echo Shard",
-                "Echo Shard", "Echo Shard", "Echo Shard"
-            ],
-            "shapless": false
-        },
-        {
-            "name": "Iron Sword",
-            "id": "iron_sword_1",
-            "recipe": [
-                null, "Iron Ingot", null,
-                null, "Iron Ingot", null,
-                null, "Stick", null
-            ],
-            "shapless": false
-        }
-    ]
+    "data": {
+        "coloredBed0": [
+            {
+                "name": "Red Bed",
+                "id": "red_bed",
+                "src": "Red_Bed.png",
+                "recipe": [
+                    null, null, null,
+                    "Red Wool", "Red Wool", "Red Wool",
+                    ["Oak Planks", "Dark Oak Planks"], ["Oak Planks", "Dark Oak Planks"], ["Oak Planks", "Dark Oak Planks"]
+                ],
+                "shapeless": false
+            },
+            {
+                "name": "White Bed",
+                "id": "white_bed",
+                "src": "White_Bed.png",
+                "recipe": [
+                    null, null, null,
+                    "White Wool", "White Wool", "White Wool",
+                    ["Oak Planks", "Dark Oak Planks"], ["Oak Planks", "Dark Oak Planks"], ["Oak Planks", "Dark Oak Planks"]
+                ],
+                "shapeless": false
+            }
+        ],
+        "coloredBed1": [
+            {
+                "name": "Red Bed",
+                "id": "red_bed",
+                "src": "Red_Bed.png",
+                "recipe": {
+                    "optional": [],
+                    "required": ["Red Dye", ["Green Bed", "Purple Bed", "White Bed"]]
+                },
+                "shapeless": true
+            },
+            {
+                "name": "Black Bed",
+                "id": "black_bed",
+                "src": "Black_Bed.png",
+                "recipe": {
+                    "optional": [],
+                    "required": ["Black Dye", ["Green Bed", "Purple Bed", "White Bed"]]
+                },
+                "shapeless": true
+            }
+        ],
+        "diamondHoe0": [
+            {
+                "name": "Diamond Hoe",
+                "id": "diamond_hoe",
+                "src": "Diamond_Hoe.png",
+                "recipe": [
+                    "Diamond", "Diamond", null,
+                    null, "Stick", null,
+                    null, "Stick", null
+                ],
+                "shapeless": false
+            },
+            {
+                "name": "Diamond Hoe",
+                "id": "diamond_hoe",
+                "src": "Diamond_Hoe.png",
+                "recipe": [
+                    null, "Diamond", "Diamond",
+                    null, "Stick", null,
+                    null, "Stick", null
+                ],
+                "shapeless": false
+            }
+        ]
+    }
 }
