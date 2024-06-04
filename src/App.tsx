@@ -1,6 +1,6 @@
 import io from 'socket.io-client';
 import { Playmat } from './components/Playmat.tsx';
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate} from "react-router-dom";
 import { Menu } from './components/Menu.tsx';
 import "./Menu.css"
 import './Guide.css'
@@ -27,6 +27,7 @@ function App() {
           <Route path="howtoplay" element={<Guide/>} />
           <Route path="classic" element={<Playmat socket={socket} url={url} mode={0}/>} />
           <Route path="allinone" element={<Playmat socket={socket} url={url} mode={1}/>} />
+          <Route path="*" element={<Navigate to="/" />} />
         </Route>
       </Routes>
     </BrowserRouter>
