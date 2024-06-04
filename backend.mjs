@@ -154,7 +154,7 @@ io.on('connection', async (socket) => {
     });
 
     socket.on("newRiddle", async (data) => {
-        let mode = data.mode;
+        let mode = data?.mode;
         let exist = riddles[socket.id] == undefined;
         try {
             await createRiddle(socket, mode);
